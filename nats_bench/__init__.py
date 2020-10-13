@@ -12,6 +12,8 @@ from nats_bench.api_size import NATSsize
 
 
 NATS_BENCH_API_VERSIONs = ['v1.0']    # [2020.08.31]
+NATS_BENCH_SSS_NAMEs = ('sss', 'size')
+NATS_BENCH_TSS_NAMEs = ('tss', 'topology')
 
 
 def version():
@@ -28,9 +30,31 @@ def create(file_path_or_dict, search_space, fast_mode=False, verbose=True):
                If False, we will load all the data during initialization.
     verbose: This is a flag to indicate whether log additional information.
   """
-  if search_space in ['tss', 'topology']:
+  if search_space in NATS_BENCH_TSS_NAMEs:
     return NATStopology(file_path_or_dict, fast_mode, verbose)
-  elif search_space in ['sss', 'size']:
+  elif search_space in NATS_BENCH_SSS_NAMEs:
     return NATSsize(file_path_or_dict, fast_mode, verbose)
   else:
     raise ValueError('invalid search space : {:}'.format(search_space))
+
+
+def search_space_info(main_tag, aux_tag):
+  nats_sss = dict(candidates=[8, 16, 24, 32, 40, 48, 56, 64],
+                  num_layers=5)
+  nats_tss = dict(op_names=['none', 'skip_connect',
+                            'nor_conv_1x1', 'nor_conv_3x3',
+                            'avg_pool_3x3'],
+                  num_nodes=4)
+  if main_tag == 'nats-bench':
+    if aux_tag in NATS_BENCH_SSS_NAMEs:
+      return nats_sss
+    elif aux_tag in NATS_BENCH_TSS_NAMEs:
+      return nats_tss
+    else:
+      raise ValueError('Unknown auxiliary tag: {:}'.format(aux_tag))
+  elif main_tag == 'nas-bench-201':
+    if aux_tag is not None:
+      raise ValueError('For NAS-Bench-201, the auxiliary tag should be None.')
+    return nats_tss
+  else:
+    raise ValueError('Unknown main tag: {:}'.format(main_tag))

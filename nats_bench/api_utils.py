@@ -1,7 +1,7 @@
 #####################################################
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.07 #
 ############################################################################################
-# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size
+# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size ###############
 ############################################################################################
 # In this Python file, we define NASBenchMetaAPI, the abstract class for benchmark APIs.
 # We also define the class ArchResults, which contains all information of a single architecture trained by one kind of hyper-parameters on three datasets.
