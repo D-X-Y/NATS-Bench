@@ -44,7 +44,7 @@ def pickle_save(obj, file_path, ext='.pbz2', protocol=4):
   """
   # with open(file_path, 'wb') as cfile:
   with bz2.BZ2File(str(file_path) + ext, 'wb') as cfile:
-    pickle.dump(obj, cfile, protocol=protocol)
+    pickle.dump(obj, cfile, protocol=protocol)  # pytype: disable=wrong-arg-types
 
 
 def pickle_load(file_path, ext='.pbz2'):
@@ -54,7 +54,7 @@ def pickle_load(file_path, ext='.pbz2'):
   else:
     xfile_path = str(file_path) + ext
   with bz2.BZ2File(xfile_path, 'rb') as cfile:
-    return pickle.load(cfile)
+    return pickle.load(cfile)  # pytype: disable=wrong-arg-types
 
 
 def time_string():
@@ -125,6 +125,16 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                fast_mode: bool = False,
                verbose: bool = True):
     """The initialization function that takes the dataset file path (or a dict loaded from that path) as input."""
+    # NOTE(xuanyidong): the following attributes must be initilaized in subclass
+    self.meta_archs = None
+    self.verbose = None
+    self.evaluated_indexes = None
+    self.arch2infos_dict = None
+    self.filename = None
+    self._fast_mode = None
+    self._archive_dir = None
+    self._avaliable_hps = None
+    self.archstr2index = None
 
   def __getitem__(self, index: int):
     return copy.deepcopy(self.meta_archs[index])
@@ -176,6 +186,15 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
 
   def reset_time(self):
     self._used_time = 0
+
+  @abc.abstractmethod
+  def get_more_info(self,
+                    index,
+                    dataset,
+                    iepoch=None,
+                    hp: Text = '12',
+                    is_random: bool = True):
+    """Return the metric for the `index`-th architecture."""
 
   def simulate_train_eval(self,
                           arch,
