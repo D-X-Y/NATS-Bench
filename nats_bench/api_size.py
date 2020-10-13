@@ -1,66 +1,83 @@
 #####################################################
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.08 #
 ##############################################################################
-# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size # 
-#####################################################################################
-# The history of benchmark files (the name is NATS-sss-[version]-[md5].pickle.pbz2) #
-# [2020.08.31] NATS-sss-v1_0-50262.pickle.pbz2                                      #
-#####################################################################################
-import os, copy, random, numpy as np
-from typing import List, Text, Union, Dict, Optional
-from collections import OrderedDict, defaultdict
+# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size #
+##############################################################################
+# The history of benchmark files are as follows,                             #
+# where the format is (the name is NATS-sss-[version]-[md5].pickle.pbz2)     #
+# [2020.08.31] NATS-sss-v1_0-50262.pickle.pbz2                               #
+##############################################################################
+"""The API for size search space in NATS-Bench."""
+import collections
+import copy
+import os
+import random
+from typing import Dict, Optional, Text, Union, Any
 
-from nats_bench.api_utils import time_string
-from nats_bench.api_utils import pickle_load
 from nats_bench.api_utils import ArchResults
 from nats_bench.api_utils import NASBenchMetaAPI
-from nats_bench.api_utils import remap_dataset_set_names
 from nats_bench.api_utils import nats_is_dir
 from nats_bench.api_utils import nats_is_file
 from nats_bench.api_utils import PICKLE_EXT
+from nats_bench.api_utils import pickle_load
+from nats_bench.api_utils import time_string
 
 
 ALL_BASE_NAMES = ['NATS-sss-v1_0-50262']
 
 
 def print_information(information, extra_info=None, show=False):
+  """print out the information of a given ArchResults."""
   dataset_names = information.get_dataset_names()
-  strings = [information.arch_str, 'datasets : {:}, extra-info : {:}'.format(dataset_names, extra_info)]
+  strings = [
+      information.arch_str,
+      'datasets : {:}, extra-info : {:}'.format(dataset_names, extra_info)
+  ]
+
   def metric2str(loss, acc):
     return 'loss = {:.3f} & top1 = {:.2f}%'.format(loss, acc)
 
-  for ida, dataset in enumerate(dataset_names):
+  for dataset in dataset_names:
     metric = information.get_compute_costs(dataset)
     flop, param, latency = metric['flops'], metric['params'], metric['latency']
-    str1 = '{:14s} FLOP={:6.2f} M, Params={:.3f} MB, latency={:} ms.'.format(dataset, flop, param, '{:.2f}'.format(latency*1000) if latency is not None and latency > 0 else None)
+    str1 = '{:14s} FLOP={:6.2f} M, Params={:.3f} MB, latency={:} ms.'.format(
+        dataset, flop, param,
+        '{:.2f}'.format(latency *
+                        1000) if latency is not None and latency > 0 else None)
     train_info = information.get_metrics(dataset, 'train')
     if dataset == 'cifar10-valid':
       valid_info = information.get_metrics(dataset, 'x-valid')
       test__info = information.get_metrics(dataset, 'ori-test')
       str2 = '{:14s} train : [{:}], valid : [{:}], test : [{:}]'.format(
-                dataset, metric2str(train_info['loss'], train_info['accuracy']),
-                metric2str(valid_info['loss'], valid_info['accuracy']),
-                metric2str(test__info['loss'], test__info['accuracy']))
+          dataset, metric2str(train_info['loss'], train_info['accuracy']),
+          metric2str(valid_info['loss'], valid_info['accuracy']),
+          metric2str(test__info['loss'], test__info['accuracy']))
     elif dataset == 'cifar10':
       test__info = information.get_metrics(dataset, 'ori-test')
-      str2 = '{:14s} train : [{:}], test  : [{:}]'.format(dataset, metric2str(train_info['loss'], train_info['accuracy']), metric2str(test__info['loss'], test__info['accuracy']))
+      str2 = '{:14s} train : [{:}], test  : [{:}]'.format(
+          dataset, metric2str(train_info['loss'], train_info['accuracy']),
+          metric2str(test__info['loss'], test__info['accuracy']))
     else:
       valid_info = information.get_metrics(dataset, 'x-valid')
       test__info = information.get_metrics(dataset, 'x-test')
-      str2 = '{:14s} train : [{:}], valid : [{:}], test : [{:}]'.format(dataset, metric2str(train_info['loss'], train_info['accuracy']), metric2str(valid_info['loss'], valid_info['accuracy']), metric2str(test__info['loss'], test__info['accuracy']))
+      str2 = '{:14s} train : [{:}], valid : [{:}], test : [{:}]'.format(
+          dataset, metric2str(train_info['loss'], train_info['accuracy']),
+          metric2str(valid_info['loss'], valid_info['accuracy']),
+          metric2str(test__info['loss'], test__info['accuracy']))
     strings += [str1, str2]
   if show: print('\n'.join(strings))
   return strings
 
 
-"""
-This is the class for the API of size search space in NATS-Bench.
-"""
 class NATSsize(NASBenchMetaAPI):
+  """This is the class for the API of size search space in NATS-Bench."""
 
-  """ The initialization function that takes the dataset file path (or a dict loaded from that path) as input. """
-  def __init__(self, file_path_or_dict: Optional[Union[Text, Dict]]=None, fast_mode: bool=False, verbose: bool=True):
-    self.ALL_BASE_NAMES = ALL_BASE_NAMES
+  def __init__(self,
+               file_path_or_dict: Optional[Union[Text, Dict[Text, Any]]] = None,
+               fast_mode: bool=False,
+               verbose: bool = True):
+    """The initialization function that takes the dataset file path (or a dict loaded from that path) as input."""
+    self._all_base_names = ALL_BASE_NAMES
     self.filename = None
     self._search_space_name = 'size'
     self._fast_mode = fast_mode
@@ -97,11 +114,11 @@ class NATSsize(NASBenchMetaAPI):
       for key in keys: assert key in file_path_or_dict, 'Can not find key[{:}] in the dict'.format(key)
       self.meta_archs = copy.deepcopy(file_path_or_dict['meta_archs'])
       # This is a dict mapping each architecture to a dict, where the key is #epochs and the value is ArchResults
-      self.arch2infos_dict = OrderedDict()
+      self.arch2infos_dict = collections.OrderedDict()
       self._avaliable_hps = set()
       for xkey in sorted(list(file_path_or_dict['arch2infos'].keys())):
         all_infos = file_path_or_dict['arch2infos'][xkey]
-        hp2archres = OrderedDict()
+        hp2archres = collections.OrderedDict()
         for hp_key, results in all_infos.items():
           hp2archres[hp_key] = ArchResults.create_from_state_dict(results)
           self._avaliable_hps.add(hp_key)  # save the avaliable hyper-parameter
@@ -110,7 +127,7 @@ class NATSsize(NASBenchMetaAPI):
     elif self.archive_dir is not None:
       benchmark_meta = pickle_load('{:}/meta.{:}'.format(self.archive_dir, PICKLE_EXT))
       self.meta_archs = copy.deepcopy(benchmark_meta['meta_archs'])
-      self.arch2infos_dict = OrderedDict()
+      self.arch2infos_dict = collections.OrderedDict()
       self._avaliable_hps = set()
       self.evaluated_indexes = set()
     else:

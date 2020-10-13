@@ -3,12 +3,13 @@
 ##############################################################################
 # NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size #
 ##############################################################################
-# The official Application Programming Interface (API) for NATS-Bench.       #
-##############################################################################
-from nats_bench.api_utils import pickle_save, pickle_load
-from nats_bench.api_utils import ArchResults, ResultsCount
-from nats_bench.api_topology import NATStopology
+"""The official Application Programming Interface (API) for NATS-Bench."""
 from nats_bench.api_size import NATSsize
+from nats_bench.api_topology import NATStopology
+from nats_bench.api_utils import ArchResults
+from nats_bench.api_utils import pickle_load
+from nats_bench.api_utils import pickle_save
+from nats_bench.api_utils import ResultsCount
 
 
 NATS_BENCH_API_VERSIONs = ['v1.0']    # [2020.08.31]
@@ -26,9 +27,16 @@ def create(file_path_or_dict, search_space, fast_mode=False, verbose=True):
   Args:
     file_path_or_dict: None or a file path or a directory path.
     search_space: This is a string indicates the search space in NATS-Bench.
-    fast_mode: If True, we will not load all the data at initialization, instead, the data for each candidate architecture will be loaded when quering it;
-               If False, we will load all the data during initialization.
+    fast_mode: If True, we will not load all the data at initialization,
+      instead, the data for each candidate architecture will be loaded when
+      quering it; If False, we will load all the data during initialization.
     verbose: This is a flag to indicate whether log additional information.
+
+  Raises:
+    ValueError: If not find the matched serach space description.
+
+  Returns:
+    The created NATS-Bench API.
   """
   if search_space in NATS_BENCH_TSS_NAMEs:
     return NATStopology(file_path_or_dict, fast_mode, verbose)
@@ -39,6 +47,7 @@ def create(file_path_or_dict, search_space, fast_mode=False, verbose=True):
 
 
 def search_space_info(main_tag, aux_tag):
+  """Obtain the search space information."""
   nats_sss = dict(candidates=[8, 16, 24, 32, 40, 48, 56, 64],
                   num_layers=5)
   nats_tss = dict(op_names=['none', 'skip_connect',
