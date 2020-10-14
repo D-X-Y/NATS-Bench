@@ -29,34 +29,6 @@ _FILE_SYSTEM = 'default'
 PICKLE_EXT = 'pickle.pbz2'
 
 
-def pickle_save(obj, file_path, ext='.pbz2', protocol=4):
-  """Use pickle to save data (obj) into file_path.
-
-  Args:
-    obj: The object to be saved into a path.
-    file_path: The target saving path.
-    ext: The extension of file name.
-    protocol: The pickle protocol. According to this documentation
-      (https://docs.python.org/3/library/pickle.html#data-stream-format),
-      the protocol version 4 was added in Python 3.4. It adds support for very
-      large objects, pickling more kinds of objects, and some data format
-      optimizations. It is the default protocol starting with Python 3.8.
-  """
-  # with open(file_path, 'wb') as cfile:
-  with bz2.BZ2File(str(file_path) + ext, 'wb') as cfile:
-    pickle.dump(obj, cfile, protocol=protocol)  # pytype: disable=wrong-arg-types
-
-
-def pickle_load(file_path, ext='.pbz2'):
-  # return pickle.load(open(file_path, "rb"))
-  if os.path.isfile(str(file_path)):
-    xfile_path = str(file_path)
-  else:
-    xfile_path = str(file_path) + ext
-  with bz2.BZ2File(xfile_path, 'rb') as cfile:
-    return pickle.load(cfile)  # pytype: disable=wrong-arg-types
-
-
 def time_string():
   iso_time_format = '%Y-%m-%d %X'
   string = '[{:}]'.format(
@@ -78,7 +50,7 @@ def nats_is_dir(file_path):
     return os.path.isdir(file_path)
   elif _FILE_SYSTEM == 'google':
     import tensorflow as tf  # pylint: disable=g-import-not-at-top
-    return tf.gfile.isdir(file_path)
+    return tf.io.gfile.isdir(file_path)
   else:
     raise ValueError('Unknown file system lib: {:}'.format(_FILE_SYSTEM))
 
@@ -88,7 +60,47 @@ def nats_is_file(file_path):
     return os.path.isfile(file_path)
   elif _FILE_SYSTEM == 'google':
     import tensorflow as tf  # pylint: disable=g-import-not-at-top
-    return tf.gfile.exists(file_path) and not tf.gfile.isdir(file_path)
+    return tf.io.gfile.exists(file_path) and not tf.io.gfile.isdir(file_path)
+  else:
+    raise ValueError('Unknown file system lib: {:}'.format(_FILE_SYSTEM))
+
+
+def pickle_save(obj, file_path, ext='.pbz2', protocol=4):
+  """Use pickle to save data (obj) into file_path.
+
+  Args:
+    obj: The object to be saved into a path.
+    file_path: The target saving path.
+    ext: The extension of file name.
+    protocol: The pickle protocol. According to this documentation
+      (https://docs.python.org/3/library/pickle.html#data-stream-format),
+      the protocol version 4 was added in Python 3.4. It adds support for very
+      large objects, pickling more kinds of objects, and some data format
+      optimizations. It is the default protocol starting with Python 3.8.
+  """
+  # with open(file_path, 'wb') as cfile:
+  if _FILE_SYSTEM == 'default':
+    with bz2.BZ2File(str(file_path) + ext, 'wb') as cfile:
+      pickle.dump(obj, cfile, protocol=protocol)  # pytype: disable=wrong-arg-types
+  else:
+    raise ValueError('Unknown file system lib: {:}'.format(_FILE_SYSTEM))
+
+
+def pickle_load(file_path, ext='.pbz2'):
+  """Use pickle to load the file on different systems."""
+  # return pickle.load(open(file_path, "rb"))
+  if nats_is_file(str(file_path)):
+    xfile_path = str(file_path)
+  else:
+    xfile_path = str(file_path) + ext
+  if _FILE_SYSTEM == 'default':
+    with bz2.BZ2File(xfile_path, 'rb') as cfile:
+      return pickle.load(cfile)  # pytype: disable=wrong-arg-types
+  elif _FILE_SYSTEM == 'google':
+    import tensorflow as tf  # pylint: disable=g-import-not-at-top
+    file_content = tf.io.gfile.GFile(file_path, mode='rb').read()
+    byte_content = bz2.decompress(file_content)
+    return pickle.loads(byte_content)
   else:
     raise ValueError('Unknown file system lib: {:}'.format(_FILE_SYSTEM))
 
