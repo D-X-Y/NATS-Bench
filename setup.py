@@ -2,6 +2,16 @@
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.06 #
 #####################################################
 """The setup function for pypi."""
+# Use twine to upload nats_bench to pypi.
+# conda install -c conda-forge twine
+#
+# python setup.py sdist bdist_wheel
+# python setup.py --help-commands
+# twine check dist/*
+#
+# twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+# twine upload dist/*
+#
 # [2020.08.31] v1.0
 import os
 from setuptools import setup

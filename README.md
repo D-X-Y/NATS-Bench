@@ -91,7 +91,7 @@ api_test.test_nats_bench_tss('NATS-sss-v1_0-50262-simple')
 If you find that NATS-Bench helps your research, please consider citing it:
 ```
 @article{dong2020nats,
-  title={NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size},
+  title={{NATS-Bench}: Benchmarking NAS algorithms for Architecture Topology and Size},
   author={Dong, Xuanyi and Liu, Lu and Musial, Katarzyna and Gabrys, Bogdan},
   journal={arXiv preprint arXiv:2009.00437},
   year={2020}
