@@ -45,6 +45,17 @@ def get_file_system():
   return _FILE_SYSTEM
 
 
+def get_torch_home():
+  if 'TORCH_HOME' in os.environ:
+    return os.environ['TORCH_HOME']
+  elif 'HOME' in os.environ:
+    return os.path.join(os.environ['HOME'], '.torch')
+  else:
+    raise ValueError('Did not find HOME in os.environ. '
+      'Please at least setup the path of HOME or TORCH_HOME '
+      'in the environment.')
+
+
 def nats_is_dir(file_path):
   if _FILE_SYSTEM == 'default':
     return os.path.isdir(file_path)
@@ -189,6 +200,10 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
   @property
   def archive_dir(self):
     return self._archive_dir
+
+  @property
+  def full_train_epochs(self):
+    return self._full_train_epochs
 
   def reset_archive_dir(self, archive_dir):
     self._archive_dir = archive_dir
@@ -411,13 +426,13 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
           arch_index, hp))
     self._prepare_info(arch_index)
     if arch_index in self.arch2infos_dict:
-      if hp not in self.arch2infos_dict[arch_index]:
+      if str(hp) not in self.arch2infos_dict[arch_index]:
         raise ValueError('The {:}-th architecture only has hyper-parameters of '
                          '{:} instead of {:}.'.format(
                              arch_index,
                              list(self.arch2infos_dict[arch_index].keys()),
                              hp))
-      info = self.arch2infos_dict[arch_index][hp]
+      info = self.arch2infos_dict[arch_index][str(hp)]
     else:
       raise ValueError('arch_index [{:}] does not in arch2infos'.format(
           arch_index))
@@ -457,7 +472,7 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
     if self.verbose:
       print('{:} Call query_by_index with arch_index={:}, dataname={:}, '
             'hp={:}'.format(time_string(), arch_index, dataname, hp))
-    info = self.query_meta_info_by_index(arch_index, hp)
+    info = self.query_meta_info_by_index(arch_index, str(hp))
     if dataname is None:
       return info
     else:
@@ -482,6 +497,7 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
     best_index, highest_accuracy = -1, None
     evaluated_indexes = sorted(list(self.evaluated_indexes))
     for arch_index in evaluated_indexes:
+      self._prepare_info(arch_index)
       arch_info = self.arch2infos_dict[arch_index][hp]
       info = arch_info.get_compute_costs(dataset)  # the information of costs
       flop, param, latency = info['flops'], info['params'], info['latency']
@@ -622,6 +638,8 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         print('<' * 40 + '------------' + '<' * 40)
     else:
       if 0 <= index < len(self.meta_archs):
+        if index not in self.evaluated_indexes:
+          self._prepare_info(index)
         if index not in self.evaluated_indexes:
           print('The {:}-th architecture has not been evaluated '
                 'or not saved.'.format(index))

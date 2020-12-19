@@ -13,6 +13,7 @@
 # twine upload dist/*
 #
 # [2020.08.31] v1.0
+# [2020.12.20] v1.1
 import os
 from setuptools import setup
 
@@ -26,7 +27,7 @@ def read(fname="README.md"):
 
 setup(
     name="nats_bench",
-    version="1.0",
+    version="1.1",
     author="Xuanyi Dong",
     author_email="dongxuanyi888@gmail.com",
     description="API for NATS-Bench (a dataset for neural architecture topology and size).",

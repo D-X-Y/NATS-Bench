@@ -17,6 +17,7 @@ from typing import Dict, Optional, Text, Union, Any
 
 from nats_bench.api_utils import ArchResults
 from nats_bench.api_utils import NASBenchMetaAPI
+from nats_bench.api_utils import get_torch_home
 from nats_bench.api_utils import nats_is_dir
 from nats_bench.api_utils import nats_is_file
 from nats_bench.api_utils import PICKLE_EXT
@@ -83,14 +84,15 @@ class NATSsize(NASBenchMetaAPI):
     self._search_space_name = 'size'
     self._fast_mode = fast_mode
     self._archive_dir = None
+    self._full_train_epochs = 90
     self.reset_time()
     if file_path_or_dict is None:
       if self._fast_mode:
         self._archive_dir = os.path.join(
-            os.environ['TORCH_HOME'], '{:}-simple'.format(ALL_BASE_NAMES[-1]))
+            get_torch_home(), '{:}-simple'.format(ALL_BASE_NAMES[-1]))
       else:
         file_path_or_dict = os.path.join(
-            os.environ['TORCH_HOME'], '{:}.{:}'.format(
+            get_torch_home(), '{:}.{:}'.format(
                 ALL_BASE_NAMES[-1], PICKLE_EXT))
       print('{:} Try to use the default NATS-Bench (size) path from '
             'fast_mode={:} and path={:}.'.format(time_string(), self._fast_mode,
@@ -241,7 +243,10 @@ class NATSsize(NASBenchMetaAPI):
       except Exception as unused_e:  # pylint: disable=broad-except
         test_info = None
       valtest_info = None
+      xinfo['comment'] = 'In this dict, train-loss/accuracy/time is the metric on the train set of CIFAR-10. The test-loss/accuracy/time is the performance of the CIFAR-10 test set after training on the train set by {:} epochs. The per-time and total-time indicate the per epoch and total time costs, respectively.'.format(hp)
     else:
+      if dataset == 'cifar10':
+        xinfo['comment'] = 'In this dict, train-loss/accuracy/time is the metric on the train+valid sets of CIFAR-10. The test-loss/accuracy/time is the performance of the CIFAR-10 test set after training on the train+valid sets by {:} epochs. The per-time and total-time indicate the per epoch and total time costs, respectively.'.format(hp)
       try:  # collect results on the proposed test set
         if dataset == 'cifar10':
           test_info = archresult.get_metrics(
