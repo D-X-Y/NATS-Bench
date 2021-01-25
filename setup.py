@@ -11,6 +11,7 @@
 #
 # twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 # twine upload dist/*
+# https://pypi.org/project/nats-bench
 #
 # [2020.08.31] v1.0
 # [2020.12.20] v1.1
