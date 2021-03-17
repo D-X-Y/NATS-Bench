@@ -28,10 +28,12 @@ jobs:
           cd ..
           if [ "$RUNNER_OS" == "Windows" ]; then
             python.exe -m pip install black
-            python.exe -m black qlib -l 120 --check --diff
+            python.exe -m black nats_bench -l 120 --check --diff
+            python.exe -m black tests -l 120 --check --diff
           else
             python -m pip install black
-            python -m black qlib -l 120 --check --diff
+            python -m black nats_bench -l 120 --check --diff
+            python -m black tests -l 120 --check --diff
           fi
         shell: bash
 
