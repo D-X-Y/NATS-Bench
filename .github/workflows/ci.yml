@@ -28,14 +28,16 @@ jobs:
           cd ..
           if [ "$RUNNER_OS" == "Windows" ]; then
             python.exe -m pip install black
-            python.exe -m black nats_bench -l 120 --check --diff
-            python.exe -m black tests -l 120 --check --diff
+            python.exe -m black NATS-Bench/nats_bench -l 120 --check --diff
+            python.exe -m black NATS-Bench/tests -l 120 --check --diff
           else
             python -m pip install black
             python --version
             python -m black --version
             echo $PWD
-            python -m black . -l 120 --check --diff --verbose
+            ls
+            python -m black NATS-Bench/nats_bench -l 120 --check --diff --verbose
+            python -m black NATS-Bench/tests -l 120 --check --diff --verbose
           fi
         shell: bash
 

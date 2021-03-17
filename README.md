@@ -46,6 +46,8 @@ These benchmark files (without pretrained weights) can also be downloaded from [
 
 ## Usage
 
+See more examples at [notebooks](notebooks).
+
 1, create the benchmark instance:
 ```
 from nats_bench import create
