@@ -31,9 +31,10 @@ jobs:
             python.exe -m black nats_bench -l 120 --check --diff
             python.exe -m black tests -l 120 --check --diff
           else
+            python --version
+            echo $PWD
             python -m pip install black
-            python -m black nats_bench -l 120 --check --diff
-            python -m black tests -l 120 --check --diff
+            python -m black . -l 120 --check --diff
           fi
         shell: bash
 
