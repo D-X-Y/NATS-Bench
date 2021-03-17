@@ -50,3 +50,11 @@ jobs:
           export FAKE_TORCH_HOME="fake_torch_dir"
           python -m pip install pytest
           python -m pytest . --durations=0
+
+      - name: Install nats_bench from pip with tests
+        run: |
+          pip uninstall -y nats_bench
+          python -m pip install nats_bench
+          export FAKE_TORCH_HOME="fake_torch_dir"
+          python -m pip install pytest
+          python -m pytest . --durations=0
