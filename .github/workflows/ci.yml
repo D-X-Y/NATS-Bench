@@ -34,7 +34,7 @@ jobs:
             python --version
             echo $PWD
             python -m pip install black
-            python -m black . -l 120 --check --diff
+            python -m black . -l 120 --check --diff --verbose
           fi
         shell: bash
 
@@ -45,4 +45,5 @@ jobs:
       - name: Run tests with pytest
         run: |
           export FAKE_TORCH_HOME="fake_torch_dir"
+          python -m pip install pytest
           python -m pytest . --durations=0
