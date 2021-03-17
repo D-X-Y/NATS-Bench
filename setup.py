@@ -27,16 +27,12 @@ VERSION = "1.2"
 
 
 def read(fname="README.md"):
-  with open(
-      os.path.join(os.path.dirname(__file__), fname),
-      encoding="utf-8") as cfile:
-    return cfile.read()
+    with open(os.path.join(os.path.dirname(__file__), fname), encoding="utf-8") as cfile:
+        return cfile.read()
 
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    "numpy>=1.18.5"
-]
+REQUIRED = ["numpy>=1.18.5"]
 
 setup(
     name=NAME,
