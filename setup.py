@@ -20,7 +20,7 @@ import os
 from setuptools import setup
 
 NAME = "nats_bench"
-REQUIRES_PYTHON = ">=3.5.0"
+REQUIRES_PYTHON = ">=3.6"
 DESCRIPTION = "API for NATS-Bench (a dataset/benchmark for neural architecture topology and size)."
 
 VERSION = "1.2"
@@ -32,7 +32,7 @@ def read(fname="README.md"):
 
 
 # What packages are required for this module to be executed?
-REQUIRED = ["numpy>=1.18.5"]
+REQUIRED = ["numpy>=1.16.5,<=1.19.5"]
 
 setup(
     name=NAME,

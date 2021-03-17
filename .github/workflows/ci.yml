@@ -34,7 +34,7 @@ jobs:
             python --version
             echo $PWD
             python -m pip install black
-            python -m black . -l 120 --check --diff --verbose
+            python -m black ./nats_bench -l 120 --check --diff --verbose
           fi
         shell: bash
 
