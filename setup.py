@@ -15,8 +15,15 @@
 #
 # [2020.08.31] v1.0
 # [2020.12.20] v1.1
+# [2021.03.17] v1.2
 import os
 from setuptools import setup
+
+NAME = "nats_bench"
+REQUIRES_PYTHON = ">=3.5.0"
+DESCRIPTION = "API for NATS-Bench (a dataset/benchmark for neural architecture topology and size)."
+
+VERSION = "1.2"
 
 
 def read(fname="README.md"):
@@ -26,20 +33,28 @@ def read(fname="README.md"):
     return cfile.read()
 
 
+# What packages are required for this module to be executed?
+REQUIRED = [
+    "numpy>=1.18.5"
+]
+
 setup(
-    name="nats_bench",
-    version="1.1",
+    name=NAME,
+    version=VERSION,
     author="Xuanyi Dong",
     author_email="dongxuanyi888@gmail.com",
-    description="API for NATS-Bench (a dataset for neural architecture topology and size).",
-    license="MIT",
+    description=DESCRIPTION,
+    license="MIT Licence",
     keywords="NAS Dataset API DeepLearning",
     url="https://github.com/D-X-Y/NATS-Bench",
     packages=["nats_bench"],
+    install_requires=REQUIRED,
+    python_requires=REQUIRES_PYTHON,
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
         "Topic :: Database",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: MIT License",

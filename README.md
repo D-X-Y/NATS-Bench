@@ -8,17 +8,18 @@ We also show the versatility of NATS-Bench by benchmarking 13 recent state-of-th
 This facilitates a much larger community of researchers to focus on developing better NAS algorithms in a more comparable and computationally effective environment.
 
 **You can use `pip install nats_bench` to install the library of NATS-Bench.**
+or install from source by `python setup.py install`.
 
-If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects/blob/master/docs/NATS-Bench.md#how-to-re-create-nats-bench-from-scratch).
+If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects/blob/main/docs/NATS-Bench.md#how-to-re-create-nats-bench-from-scratch).
 
-If you have questions, please ask at [here](https://github.com/D-X-Y/AutoDL-Projects/issues) or email me :)
+If you have questions, please ask at [here](https://github.com/D-X-Y/AutoDL-Projects/issues) or [email me](mailto:dongxuanyi888@gmail.com) :)
 
 
 ## Preparation and Download
 
 In NATS-Bench, we (create and) use three image datasets -- CIFAR-10, CIFAR-100, and ImageNet16-120.
 For more details, please see Sec-3.2 in [the NATS-Bench paper](https://arxiv.org/pdf/2009.00437.pdf). To download these three datasets, please find them at [Google Drive](https://drive.google.com/drive/folders/1T3UIyZXUhMmIuJLOBMIYKAsJknAtrrO4?usp=sharing).
-To create the `ImageNet16-120` PyTorch dataset, please call [AutoDL-Projects/lib/datasets/ImageNet16](https://github.com/D-X-Y/AutoDL-Projects/blob/master/lib/datasets/get_dataset_with_transform.py#L168), by using:
+To create the `ImageNet16-120` PyTorch dataset, please call [AutoDL-Projects/lib/datasets/ImageNet16](https://github.com/D-X-Y/AutoDL-Projects/blob/main/lib/datasets/get_dataset_with_transform.py#L168), by using:
 ```
 train_data = ImageNet16(root, True , train_transform, 120)
 test_data  = ImageNet16(root, False, test_transform , 120)
@@ -95,7 +96,6 @@ from nats_bench import api_test
 api_test.test_nats_bench_tss('NATS-tss-v1_0-3ffb9-simple')
 api_test.test_nats_bench_tss('NATS-sss-v1_0-50262-simple')
 ```
-
 
 ## Citation
 
