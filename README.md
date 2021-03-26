@@ -99,6 +99,174 @@ api_test.test_nats_bench_tss('NATS-tss-v1_0-3ffb9-simple')
 api_test.test_nats_bench_tss('NATS-sss-v1_0-50262-simple')
 ```
 
+
+
+## How to Re-create NATS-Bench from Scratch
+
+**You need to use the [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) repo to re-create NATS-Bench from scratch.**
+
+### The Size Search Space
+
+The following command will train all architecture candidate in the size search space with 90 epochs and use the random seed of `777`.
+If you want to use a different number of training epochs, please replace `90` with it, such as `01` or `12`.
+```
+bash ./scripts/NATS-Bench/train-shapes.sh 00000-32767 90 777
+```
+The checkpoint of all candidates are located at `output/NATS-Bench-size` by default.
+
+After training these candidate architectures, please use the following command to re-organize all checkpoints into the official benchmark file.
+```
+python exps/NATS-Bench/sss-collect.py
+```
+
+### The Topology Search Space
+
+The following command will train all architecture candidate in the topology search space with 200 epochs and use the random seed of `777`/`888`/`999`.
+If you want to use a different number of training epochs, please replace `200` with it, such as `12`.
+```
+bash scripts/NATS-Bench/train-topology.sh 00000-15624 200 '777 888 999'
+```
+The checkpoint of all candidates are located at `output/NATS-Bench-topology` by default.
+
+After training these candidate architectures, please use the following command to re-organize all checkpoints into the official benchmark file.
+```
+python exps/NATS-Bench/tss-collect.py
+```
+
+
+## To Reproduce 13 Baseline NAS Algorithms in NATS-Bench
+
+**You need to use the [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) repo to run 13 baseline NAS methods.**
+
+### Reproduce NAS methods on the topology search space
+
+Please use the following commands to run different NAS methods on the topology search space:
+```
+Four multi-trial based methods:
+python ./exps/NATS-algos/reinforce.py       --dataset cifar100 --search_space tss --learning_rate 0.01
+python ./exps/NATS-algos/regularized_ea.py  --dataset cifar100 --search_space tss --ea_cycles 200 --ea_population 10 --ea_sample_size 3
+python ./exps/NATS-algos/random_wo_share.py --dataset cifar100 --search_space tss
+python ./exps/NATS-algos/bohb.py            --dataset cifar100 --search_space tss --num_samples 4 --random_fraction 0.0 --bandwidth_factor 3
+
+DARTS (first order):
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v1
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v1
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v1
+
+DARTS (second order):
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo darts-v2
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo darts-v2
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo darts-v2
+
+GDAS:
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo gdas
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo gdas
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16
+
+SETN:
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo setn
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo setn
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo setn
+
+Random Search with Weight Sharing:
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo random
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo random
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo random
+
+ENAS:
+python ./exps/NATS-algos/search-cell.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001
+python ./exps/NATS-algos/search-cell.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001
+python ./exps/NATS-algos/search-cell.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo enas --arch_weight_decay 0 --arch_learning_rate 0.001 --arch_eps 0.001
+```
+
+### Reproduce NAS methods on the size search space
+
+Please use the following commands to run different NAS methods on the size search space:
+```
+Four multi-trial based methods:
+python ./exps/NATS-algos/reinforce.py       --dataset cifar100 --search_space sss --learning_rate 0.01
+python ./exps/NATS-algos/regularized_ea.py  --dataset cifar100 --search_space sss --ea_cycles 200 --ea_population 10 --ea_sample_size 3
+python ./exps/NATS-algos/random_wo_share.py --dataset cifar100 --search_space sss
+python ./exps/NATS-algos/bohb.py            --dataset cifar100 --search_space sss --num_samples 4 --random_fraction 0.0 --bandwidth_factor 3
+
+
+Run Transformable Architecture Search (TAS), proposed in Network Pruning via Transformable Architecture Search, NeurIPS 2019
+
+python ./exps/NATS-algos/search-size.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo tas --rand_seed 777
+python ./exps/NATS-algos/search-size.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo tas --rand_seed 777
+python ./exps/NATS-algos/search-size.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo tas --rand_seed 777
+
+
+Run the channel search strategy in FBNet-V2 -- masking + Gumbel-Softmax :
+
+python ./exps/NATS-algos/search-size.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo mask_gumbel --rand_seed 777
+python ./exps/NATS-algos/search-size.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo mask_gumbel --rand_seed 777
+python ./exps/NATS-algos/search-size.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo mask_gumbel --rand_seed 777
+
+
+Run the channel search strategy in TuNAS -- masking + sampling :
+
+python ./exps/NATS-algos/search-size.py --dataset cifar10  --data_path $TORCH_HOME/cifar.python --algo mask_rl --arch_weight_decay 0 --rand_seed 777 --use_api 0
+python ./exps/NATS-algos/search-size.py --dataset cifar100 --data_path $TORCH_HOME/cifar.python --algo mask_rl --arch_weight_decay 0 --rand_seed 777
+python ./exps/NATS-algos/search-size.py --dataset ImageNet16-120 --data_path $TORCH_HOME/cifar.python/ImageNet16 --algo mask_rl --arch_weight_decay 0 --rand_seed 777
+```
+
+### Final Discovered Architectures for Each Algorithm
+
+The architecture index can be found by use `api.query_index_by_arch(architecture_string)`.
+
+The final discovered architecture ID on CIFAR-10:
+```
+DARTS (first order):
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+
+DARTS (second order):
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+|skip_connect~0|+|skip_connect~0|skip_connect~1|+|skip_connect~0|skip_connect~1|skip_connect~2|
+
+GDAS:
+|nor_conv_3x3~0|+|nor_conv_3x3~0|none~1|+|nor_conv_1x1~0|nor_conv_3x3~1|nor_conv_3x3~2|
+|nor_conv_3x3~0|+|nor_conv_3x3~0|none~1|+|nor_conv_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|
+|avg_pool_3x3~0|+|nor_conv_3x3~0|skip_connect~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_1x1~2|
+```
+
+The final discovered architecture ID on CIFAR-100:
+```
+DARTS (V1):
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|nor_conv_1x1~1|none~2|
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|nor_conv_1x1~1|none~2|
+|skip_connect~0|+|skip_connect~0|none~1|+|skip_connect~0|nor_conv_1x1~1|nor_conv_3x3~2|
+
+DARTS (V2):
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|nor_conv_1x1~1|skip_connect~2|
+|skip_connect~0|+|nor_conv_3x3~0|none~1|+|skip_connect~0|none~1|none~2|
+|skip_connect~0|+|nor_conv_1x1~0|none~1|+|nor_conv_3x3~0|skip_connect~1|none~2|
+
+GDAS:
+|nor_conv_3x3~0|+|nor_conv_1x1~0|none~1|+|avg_pool_3x3~0|nor_conv_3x3~1|nor_conv_3x3~2|
+|avg_pool_3x3~0|+|nor_conv_1x1~0|none~1|+|nor_conv_3x3~0|avg_pool_3x3~1|nor_conv_1x1~2|
+|avg_pool_3x3~0|+|nor_conv_3x3~0|none~1|+|nor_conv_3x3~0|nor_conv_1x1~1|nor_conv_1x1~2|
+```
+
+The final discovered architecture ID on ImageNet-16-120:
+```
+DARTS (V1):
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|none~1|nor_conv_3x3~2|
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|none~1|nor_conv_3x3~2|
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|none~1|nor_conv_1x1~2|
+
+DARTS (V2):
+|none~0|+|skip_connect~0|none~1|+|skip_connect~0|none~1|skip_connect~2|
+
+GDAS:
+|none~0|+|none~0|none~1|+|nor_conv_3x3~0|none~1|none~2|
+|none~0|+|none~0|none~1|+|nor_conv_3x3~0|none~1|none~2|
+|none~0|+|none~0|none~1|+|nor_conv_3x3~0|none~1|none~2|
+```
+
 ## Citation
 
 If you find that NATS-Bench helps your research, please consider citing it:

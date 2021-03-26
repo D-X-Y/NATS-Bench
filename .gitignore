@@ -100,3 +100,5 @@ main_main.py
 dist
 build
 *.egg-info
+
+.DS_Store
