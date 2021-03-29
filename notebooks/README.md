@@ -2,4 +2,6 @@
 
 We provide some examples on how to use NATS-Bench in the following notebooks:
 
-- `create-query-sss.ipynb` : create the size search space and query the performance of some architectures.
+- `[create-query-sss.ipynb](create-query-sss.ipynb)` : create the size search space and query the performance of some architectures.
+- `[find-largest.ipynb](find-largest.ipynb)` : find the largest model and report its performance on each dataset.
+- `[random-search.ipynb](random-search.ipynb)` : a small example of random search
