@@ -1,6 +1,10 @@
-# [NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size](https://arxiv.org/pdf/2009.00437.pdf)
+# [NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size](https://arxiv.org/abs/2009.00437)
 
-Neural architecture search (NAS) has attracted a lot of attention and has been illustrated to bring tangible benefits in a large number of applications in the past few years. Network topology and network size have been regarded as two of the most important aspects for the performance of deep learning models and the community has spawned lots of searching algorithms for both of those aspects of the neural architectures. However, the performance gain from these searching algorithms is achieved under different search spaces and training setups. This makes the overall performance of the algorithms incomparable and the improvement from a sub-module of the searching model unclear.
+Xuanyi Dong, Lu Liu, Katarzyna Musial, Bogdan Gabrys
+
+in IEEE TPAMI, 2021
+
+**Abstract**: Neural architecture search (NAS) has attracted a lot of attention and has been illustrated to bring tangible benefits in a large number of applications in the past few years. Network topology and network size have been regarded as two of the most important aspects for the performance of deep learning models and the community has spawned lots of searching algorithms for both of those aspects of the neural architectures. However, the performance gain from these searching algorithms is achieved under different search spaces and training setups. This makes the overall performance of the algorithms incomparable and the improvement from a sub-module of the searching model unclear.
 In this paper, we propose NATS-Bench, a unified benchmark on searching for both topology and size, for (almost) any up-to-date NAS algorithm.
 NATS-Bench includes the search space of 15,625 neural cell candidates for architecture topology and 32,768 for architecture size on three datasets.
 We analyze the validity of our benchmark in terms of various criteria and performance comparison of all candidates in the search space.
@@ -10,9 +14,9 @@ This facilitates a much larger community of researchers to focus on developing b
 **You can use `pip install nats_bench` to install the library of NATS-Bench.**
 or install from source by `python setup.py install`.
 
-If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects/blob/main/docs/NATS-Bench.md#how-to-re-create-nats-bench-from-scratch).
+If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see use [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) and see these [instructions](https://github.com/D-X-Y/NATS-Bench#reproduce-nas-methods-on-the-size-search-space).
 
-If you have questions, please ask at [here](https://github.com/D-X-Y/AutoDL-Projects/issues) or [email me](mailto:dongxuanyi888@gmail.com) :)
+If you have questions, please ask at [here](https://github.com/D-X-Y/NATS-Bench/issues) or [email me](mailto:dongxuanyi888@gmail.com) :)
 
 
 ## Preparation and Download
