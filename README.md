@@ -2,7 +2,7 @@
 
 Xuanyi Dong, Lu Liu, Katarzyna Musial, Bogdan Gabrys
 
-in IEEE TPAMI, 2021
+in IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI), 2021
 
 **Abstract**: Neural architecture search (NAS) has attracted a lot of attention and has been illustrated to bring tangible benefits in a large number of applications in the past few years. Network topology and network size have been regarded as two of the most important aspects for the performance of deep learning models and the community has spawned lots of searching algorithms for both of those aspects of the neural architectures. However, the performance gain from these searching algorithms is achieved under different search spaces and training setups. This makes the overall performance of the algorithms incomparable and the improvement from a sub-module of the searching model unclear.
 In this paper, we propose NATS-Bench, a unified benchmark on searching for both topology and size, for (almost) any up-to-date NAS algorithm.
@@ -14,12 +14,14 @@ This facilitates a much larger community of researchers to focus on developing b
 **You can use `pip install nats_bench` to install the library of NATS-Bench.**
 or install from source by `python setup.py install`.
 
-If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see use [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) and see these [instructions](https://github.com/D-X-Y/NATS-Bench#reproduce-nas-methods-on-the-size-search-space).
+If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see use [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) and see these [instructions](https://github.com/D-X-Y/NATS-Bench#how-to-re-create-nats-bench-from-scratch).
 
 If you have questions, please ask at [here](https://github.com/D-X-Y/NATS-Bench/issues) or [email me](mailto:dongxuanyi888@gmail.com) :)
 
 
 ## Preparation and Download
+
+**Step-1: download raw vision datasets.** (you can skip this one if you do not use weight-sharing NAS or re-create NATS-Bench).
 
 In NATS-Bench, we (create and) use three image datasets -- CIFAR-10, CIFAR-100, and ImageNet16-120.
 For more details, please see Sec-3.2 in [the NATS-Bench paper](https://arxiv.org/pdf/2009.00437.pdf). To download these three datasets, please find them at [Google Drive](https://drive.google.com/drive/folders/1T3UIyZXUhMmIuJLOBMIYKAsJknAtrrO4?usp=sharing).
@@ -28,6 +30,8 @@ To create the `ImageNet16-120` PyTorch dataset, please call [AutoDL-Projects/lib
 train_data = ImageNet16(root, True , train_transform, 120)
 test_data  = ImageNet16(root, False, test_transform , 120)
 ```
+
+**Step-2: download benchmark files of NATS-Bench.**
 
 The **latest** benchmark file of NATS-Bench can be downloaded from [Google Drive](https://drive.google.com/drive/folders/1zjB6wMANiKwB2A1yil2hQ8H_qyeSe2yt?usp=sharing).
 After download `NATS-[tss/sss]-[version]-[md5sum]-simple.tar`, please uncompress it by using `tar xvf [file_name]`.
@@ -96,7 +100,7 @@ network.load_state_dict(next(iter(params.values())))
 ```
 
 
-Please see [`api_test.py`](https://github.com/D-X-Y/NATS-Bench/blob/main/nats_bench/api_test.py) for more examples.
+Please see [`api_test.py`](https://github.com/D-X-Y/NATS-Bench/blob/main/tests/api_test.py) for more examples.
 ```
 from nats_bench import api_test
 api_test.test_nats_bench_tss('NATS-tss-v1_0-3ffb9-simple')
