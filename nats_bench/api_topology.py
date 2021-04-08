@@ -1,7 +1,7 @@
 #####################################################
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.08 #
 ##############################################################################
-# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size #
+# NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size #
 ##############################################################################
 # The history of benchmark files are as follows,                             #
 # where the format is (the name is NATS-tss-[version]-[md5].pickle.pbz2)     #

@@ -1,7 +1,7 @@
 #####################################################
 # Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.07 #
 ##############################################################################
-# NATS-Bench: Benchmarking NAS algorithms for Architecture Topology and Size #
+# NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size #
 ##############################################################################
 """In this file, we define NASBenchMetaAPI, ArchResults, and ResultsCount.
 
