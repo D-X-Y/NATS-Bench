@@ -465,8 +465,12 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 raise ValueError("invalid dataset-name : {:} vs. {:}".format(dataname, info.get_dataset_names()))
             return info.query(dataname)
 
-    def find_best(self, dataset, metric_on_set, flop_max=None, param_max=None, hp: Text = "12"):
+    def find_best(
+        self, dataset, metric_on_set, flop_max=None, param_max=None, hp: Text = "12", enforce_all: bool = True
+    ):
         """Find the architecture with the highest accuracy based on some constraints."""
+        # Please see how to set the `dataset` and `metric_on_set` (setname) at here:
+        # https://github.com/D-X-Y/NATS-Bench/blob/main/nats_bench/api_utils.py#L702
         if self.verbose:
             print(
                 "{:} Call find_best with dataset={:}, metric_on_set={:}, hp={:} "
@@ -476,7 +480,15 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             )
         dataset, metric_on_set = remap_dataset_set_names(dataset, metric_on_set, self.verbose)
         best_index, highest_accuracy = -1, None
-        evaluated_indexes = sorted(list(self.evaluated_indexes))
+        if enforce_all:
+            # We set this arg `enforce_all` because in the fast mode, evaluated_indexes will be empty
+            # `evaluated_indexes` is dynamically inserted with architectures along with the query
+            assert (
+                self.fast_mode
+            ), "enforce_all can only be set when fast_mode=True; if you are using non-fast-mode, please set it as False"
+            evaluated_indexes = list(range(len(self)))
+        else:
+            evaluated_indexes = sorted(list(self.evaluated_indexes))
         for arch_index in evaluated_indexes:
             self._prepare_info(arch_index)
             arch_info = self.arch2infos_dict[arch_index][hp]
@@ -494,11 +506,14 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 best_index, highest_accuracy = arch_index, accuracy
             del latency, loss
         if self.verbose:
-            print(
-                "  the best architecture : [{:}] {:} with accuracy={:.3f}%".format(
-                    best_index, self.arch(best_index), highest_accuracy
+            if not evaluated_indexes:
+                print("The evaluated_indexes is empty, please fill it before call find_best.")
+            else:
+                print(
+                    "  the best architecture : [{:}] {:} with accuracy={:.3f}%".format(
+                        best_index, self.arch(best_index), highest_accuracy
+                    )
                 )
-            )
         return best_index, highest_accuracy
 
     def get_net_param(self, index, dataset, seed: Optional[int], hp: Text = "12"):
@@ -1092,7 +1107,11 @@ class ResultsCount(object):
 
         def _internal_query(xname):
             if isinstance(self.eval_times, dict) and len(self.eval_times):
-                xtime = self.eval_times["{:}@{:}".format(xname, iepoch)]
+                key = "{:}@{:}".format(xname, iepoch)
+                if key in self.eval_times:
+                    xtime = self.eval_times[key]
+                else:
+                    raise ValueError("{:} not in {:}".format(key, self.eval_times.keys()))
                 atime = sum([self.eval_times["{:}@{:}".format(xname, i)] for i in range(iepoch + 1)])
             else:
                 xtime, atime = None, None

@@ -18,6 +18,7 @@ NATS_BENCH_API_VERSIONs = [
     "v1.0",  # [2020.08.31] initialize
     "v1.1",  # [2020.12.20] add unit tests
     "v1.2",  # [2021.03.17] black re-formulate
+    "v1.3",  # [2021.04.08] fix find_best issue for fast_mode=True
 ]
 NATS_BENCH_SSS_NAMEs = ("sss", "size")
 NATS_BENCH_TSS_NAMEs = ("tss", "topology")
