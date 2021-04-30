@@ -183,7 +183,6 @@ class NATStopology(NASBenchMetaAPI):
         arch_str = self.meta_archs[index]
         structure = topology_str2structure(arch_str)
         return structure.to_unique_str(consider_zero=True)
-        
 
     def query_info_str_by_arch(self, arch, hp: Text = "12"):
         """Query the information of a specific architecture.

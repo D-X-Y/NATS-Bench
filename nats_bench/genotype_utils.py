@@ -5,6 +5,7 @@
 #####################################################
 from copy import deepcopy
 
+
 def topology_str2structure(xstr):
     return TopologyStructure.str2structure(xstr)
 
