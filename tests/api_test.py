@@ -10,6 +10,7 @@ import os
 import pytest
 import random
 
+from nats_bench.genotype_utils import topology_str2structure
 from nats_bench.api_size import NATSsize
 from nats_bench.api_size import ALL_BASE_NAMES as sss_base_names
 from nats_bench.api_topology import NATStopology
@@ -27,6 +28,8 @@ def get_fake_torch_home_dir():
 
 
 class TestNATSBench(object):
+    """A class to test different functions of NATS-Bench API."""
+
     def test_nats_bench_tss(self, benchmark_dir=None, fake_random=True):
         if benchmark_dir is None:
             benchmark_dir = os.path.join(get_fake_torch_home_dir(), sss_base_names[-1] + "-simple")
@@ -85,6 +88,18 @@ class TestNATSBench(object):
         print("Train accuracy for  12 epochs is {:}".format(info_012_epochs["train-accuracy"]))
         info_200_epochs = api.get_more_info(284, "cifar10", hp=200)
         print("Train accuracy for 200 epochs is {:}".format(info_200_epochs["train-accuracy"]))
+
+    def test_12_th_issue(self):
+        # https://github.com/D-X-Y/NATS-Bench/issues/13
+        api = self.prepare_fake_tss()
+        structures = []
+        for arch_index in range(len(api)):
+            structures.append(topology_str2structure(api[arch_index]))
+        unique_strs = []
+        for structure in structures:
+            unique_strs.append(structure.to_unique_str(consider_zero=True))
+        unique_strs = set(unique_strs)
+        assert len(unique_strs) == 6466, "{:} vs {:}".format(len(unique_strs), 6446)
 
 
 def _test_nats_bench(benchmark_dir, is_tss, fake_random, verbose=False):

@@ -24,6 +24,8 @@ from nats_bench.api_utils import PICKLE_EXT
 from nats_bench.api_utils import pickle_load
 from nats_bench.api_utils import time_string
 
+from nats_bench.genotype_utils import topology_str2structure
+
 import numpy as np
 
 
@@ -167,6 +169,21 @@ class NATStopology(NASBenchMetaAPI):
                 "{:} Create NATS-Bench (topology) done with {:}/{:} architectures "
                 "avaliable.".format(time_string(), len(self.evaluated_indexes), len(self.meta_archs))
             )
+
+    def get_unique_str(self, arch):
+        """Return a unique string for the isomorphism architectures.
+
+        Args:
+          arch: it can be an architecture index or an architecture string.
+
+        Returns:
+          the unique string.
+        """
+        index = self.query_index_by_arch(arch)  # To avoid the arch is a string or an instance of a arch object
+        arch_str = self.meta_archs[index]
+        structure = topology_str2structure(arch_str)
+        return structure.to_unique_str(consider_zero=True)
+        
 
     def query_info_str_by_arch(self, arch, hp: Text = "12"):
         """Query the information of a specific architecture.
