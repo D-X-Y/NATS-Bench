@@ -95,7 +95,9 @@ api.reload(index=12)
 # Create the instance of th 12-th candidate for CIFAR-10.
 # To keep NATS-Bench repo concise, we did not include any model-related codes here because they rely on PyTorch.
 # The package of [models] is defined at https://github.com/D-X-Y/AutoDL-Projects
-from models import get_cell_based_tiny_net
+#   so that one need to first import this package.
+import xautodl
+from xautodl.models import get_cell_based_tiny_net
 config = api.get_net_config(12, 'cifar10')
 network = get_cell_based_tiny_net(config)
 
