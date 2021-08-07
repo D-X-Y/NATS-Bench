@@ -7,3 +7,5 @@ We provide some examples on how to use NATS-Bench in the following notebooks:
 - [`random-search.ipynb`](random-search.ipynb) : use random search on the topology search space of NATS-Bench
 - [`issue-7.ipynb`](issue-7.ipynb) : show how to use `find_best` function
 - [`issue-11.ipynb`](issue-11.ipynb) : show how to use `get_more_info` function
+
+FYI, to open and run them in your machine, execute `jupyter notebook` under the `NATS-Bench/notebooks` folder.
