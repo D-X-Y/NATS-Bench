@@ -20,7 +20,7 @@ If you have questions, please ask at [here](https://github.com/D-X-Y/NATS-Bench/
 
 This figure is the main difference between `NATS-Bench`, `NAS-Bench-101`, and `NAS-Bench-201`. The `topology search space` in `NATS-Bench` is the same as `NAS-Bench-201`, while we upgrade with results of more runs for the architecture candidates, and the benchmarked NAS algorithms have better hyperparameters.
 <p align="center">
-<img src="https://xuanyidong.com/resources/images/NATS-compare.png" width="400"/>
+<img src="https://xuanyidong.com/resources/images/NATS-compare.png" width="600"/>
 </p>
 
 
