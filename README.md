@@ -66,7 +66,7 @@ All splits are created by the command `split`.
 
 See more examples at [notebooks](notebooks).
 
-1, create the benchmark instance:
+#### 1, create the benchmark instance:
 ```
 from nats_bench import create
 # Create the API instance for the size search space in NATS
@@ -76,7 +76,7 @@ api = create(None, 'sss', fast_mode=True, verbose=True)
 api = create(None, 'tss', fast_mode=True, verbose=True)
 ```
 
-2, query the performance:
+#### 2, query the performance:
 ```
 # Query the loss / accuracy / time for 1234-th candidate architecture on CIFAR-10
 # info is a dict, where you can easily figure out the meaning by key
@@ -89,7 +89,7 @@ info = api.get_cost_info(12, 'cifar10')
 validation_accuracy, latency, time_cost, current_total_time_cost = api.simulate_train_eval(1224, dataset='cifar10', hp='12')
 ```
 
-3, create the instance of an architecture candidate in `NATS-Bench`:
+#### 3, create the instance of an architecture candidate in `NATS-Bench`:
 ```
 # Create the instance of th 12-th candidate for CIFAR-10.
 # To keep NATS-Bench repo concise, we did not include any model-related codes here because they rely on PyTorch.
@@ -105,7 +105,7 @@ params = api.get_net_param(12, 'cifar10', None)
 network.load_state_dict(next(iter(params.values())))
 ```
 
-4, others:
+#### 4, others:
 ```
 # Clear the parameters of the 12-th candidate.
 api.clear_params(12)
@@ -114,7 +114,6 @@ api.clear_params(12)
 api.reload(index=12)
 
 ```
-
 
 Please see [`api_test.py`](https://github.com/D-X-Y/NATS-Bench/blob/main/tests/api_test.py) for more examples.
 ```
