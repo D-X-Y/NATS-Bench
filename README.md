@@ -18,9 +18,9 @@ If you are seeking how to re-create NATS-Bench from scratch or reproduce benchma
 
 If you have questions, please ask at [here](https://github.com/D-X-Y/NATS-Bench/issues) or [email me](mailto:dongxuanyi888@gmail.com) :)
 
-This figure is the main difference between `NATS-Bench`, `NAS-Bench-101`, and `NAS-Bench-201`. The `topology search space` in `NATS-Bench` is the same as `NAS-Bench-201`, while we upgrade with results of more runs for the architecture candidates, and the benchmarked NAS algorithms have better hyperparameters.
+This figure is the main difference between `NATS-Bench`, `NAS-Bench-101`, and `NAS-Bench-201`. The `topology search space` (`$\mathcal{S}_t$`) in `NATS-Bench` is the same as `NAS-Bench-201`, while we upgrade with results of more runs for the architecture candidates, and the benchmarked NAS algorithms have better hyperparameters.
 <p align="center">
-<img src="https://xuanyidong.com/resources/images/NATS-compare.png" width="600"/>
+<img src="https://xuanyidong.com/resources/images/NATS-compare.png" width="700"/>
 </p>
 
 
@@ -89,14 +89,8 @@ info = api.get_cost_info(12, 'cifar10')
 validation_accuracy, latency, time_cost, current_total_time_cost = api.simulate_train_eval(1224, dataset='cifar10', hp='12')
 ```
 
-3, others:
+3, create the instance of an architecture candidate in `NATS-Bench`:
 ```
-# Clear the parameters of the 12-th candidate.
-api.clear_params(12)
-
-# Reload all information of the 12-th candidate.
-api.reload(index=12)
-
 # Create the instance of th 12-th candidate for CIFAR-10.
 # To keep NATS-Bench repo concise, we did not include any model-related codes here because they rely on PyTorch.
 # The package of [models] is defined at https://github.com/D-X-Y/AutoDL-Projects
@@ -109,6 +103,16 @@ network = get_cell_based_tiny_net(config)
 # Load the pre-trained weights: params is a dict, where the key is the seed and value is the weights.
 params = api.get_net_param(12, 'cifar10', None)
 network.load_state_dict(next(iter(params.values())))
+```
+
+4, others:
+```
+# Clear the parameters of the 12-th candidate.
+api.clear_params(12)
+
+# Reload all information of the 12-th candidate.
+api.reload(index=12)
+
 ```
 
 
