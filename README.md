@@ -151,7 +151,7 @@ python exps/NATS-Bench/tss-collect.py
 
 ## To Reproduce 13 Baseline NAS Algorithms in NATS-Bench
 
-**You need to use the [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) repo to run 13 baseline NAS methods.**
+**You need to use the [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) repo to run 13 baseline NAS methods.** Here are a brief introduction on how to run each algorithm ([NATS-algos](https://github.com/D-X-Y/AutoDL-Projects/tree/main/exps/NATS-algos)).
 
 ### Reproduce NAS methods on the topology search space
 
@@ -295,7 +295,7 @@ If you find that NATS-Bench helps your research, please consider citing it:
   note    = {\mbox{doi}:\url{10.1109/TPAMI.2021.3054824}}
 }
 @inproceedings{dong2020nasbench201,
-  title     = {NAS-Bench-201: Extending the Scope of Reproducible Neural Architecture Search},
+  title     = {{NAS-Bench-201}: Extending the Scope of Reproducible Neural Architecture Search},
   author    = {Dong, Xuanyi and Yang, Yi},
   booktitle = {International Conference on Learning Representations (ICLR)},
   url       = {https://openreview.net/forum?id=HJxyZkBKDr},
