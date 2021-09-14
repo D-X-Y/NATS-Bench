@@ -62,6 +62,8 @@ For the full checkpoints in `NATS-*ss-*-full`, we split the file into multiple p
 Each file is about `30GB`. For Baidu Pan, since they restrict the maximum size of each file, we further split `NATS-*ss-*-full.tara*` into `NATS-*ss-*-full.tara*-aa` and `NATS-*ss-*-full.tara*-ab`.
 All splits are created by the command `split`.
 
+**Note:** if you encounter the `quota exceed erros` when download from Google Drive, please try to (1) login your personal Google account, (2) right-click-copy the files to your personal Google Drive, and (3) download from your personal Google Drive.
+
 ## Usage
 
 See more examples at [notebooks](notebooks).
