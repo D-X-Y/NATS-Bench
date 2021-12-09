@@ -21,6 +21,7 @@
 # [2021.03.17] v1.2
 # [2021.04.08] v1.3
 # [2021.04.30] v1.4
+# [2021.12.09] v1.5
 import os
 from setuptools import setup
 
@@ -28,7 +29,7 @@ NAME = "nats_bench"
 REQUIRES_PYTHON = ">=3.6"
 DESCRIPTION = "API for NATS-Bench (a dataset/benchmark for neural architecture topology and size)."
 
-VERSION = "1.4"
+VERSION = "1.5"
 
 
 def read(fname="README.md"):

@@ -20,6 +20,7 @@ NATS_BENCH_API_VERSIONs = [
     "v1.2",  # [2021.03.17] black re-formulate
     "v1.3",  # [2021.04.08] fix find_best issue for fast_mode=True
     "v1.4",  # [2021.04.30] add topology_str2structure
+    "v1.5",  # [2021.12.09] make simulate_train_eval more robust
 ]
 NATS_BENCH_SSS_NAMEs = ("sss", "size")
 NATS_BENCH_TSS_NAMEs = ("tss", "topology")
