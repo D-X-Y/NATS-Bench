@@ -237,7 +237,7 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         if "valid-accuracy" in info:
             valid_acc, time_cost = info["valid-accuracy"], info["train-all-time"] + info["valid-per-time"]
         else:
-            valid_acc = info['valtest-accuracy']
+            valid_acc = info["valtest-accuracy"]
             temp_info = self.get_more_info(index, dataset, iepoch=None, hp=hp, is_random=True)
             time_cost = info["train-all-time"] + temp_info["valid-per-time"]
         latency = self.get_latency(index, dataset)
