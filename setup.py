@@ -14,6 +14,9 @@
 # twine upload dist/*
 # https://pypi.org/project/nats-bench
 #
+# NOTE(xuanyidong):
+# local install = `python setup.py install --force`
+#
 # TODO(xuanyidong): upload it to conda
 #
 # [2020.08.31] v1.0
@@ -33,7 +36,9 @@ VERSION = "1.5"
 
 
 def read(fname="README.md"):
-    with open(os.path.join(os.path.dirname(__file__), fname), encoding="utf-8") as cfile:
+    with open(
+        os.path.join(os.path.dirname(__file__), fname), encoding="utf-8"
+    ) as cfile:
         return cfile.read()
 
 

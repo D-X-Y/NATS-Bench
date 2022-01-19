@@ -31,7 +31,10 @@ ALL_BASE_NAMES = ["NATS-sss-v1_0-50262"]
 def print_information(information, extra_info=None, show=False):
     """print out the information of a given ArchResults."""
     dataset_names = information.get_dataset_names()
-    strings = [information.arch_str, "datasets : {:}, extra-info : {:}".format(dataset_names, extra_info)]
+    strings = [
+        information.arch_str,
+        "datasets : {:}, extra-info : {:}".format(dataset_names, extra_info),
+    ]
 
     def metric2str(loss, acc):
         return "loss = {:.3f} & top1 = {:.2f}%".format(loss, acc)
@@ -40,7 +43,12 @@ def print_information(information, extra_info=None, show=False):
         metric = information.get_compute_costs(dataset)
         flop, param, latency = metric["flops"], metric["params"], metric["latency"]
         str1 = "{:14s} FLOP={:6.2f} M, Params={:.3f} MB, latency={:} ms.".format(
-            dataset, flop, param, "{:.2f}".format(latency * 1000) if latency is not None and latency > 0 else None
+            dataset,
+            flop,
+            param,
+            "{:.2f}".format(latency * 1000)
+            if latency is not None and latency > 0
+            else None,
         )
         train_info = information.get_metrics(dataset, "train")
         if dataset == "cifar10-valid":
@@ -93,34 +101,48 @@ class NATSsize(NASBenchMetaAPI):
         self.reset_time()
         if file_path_or_dict is None:
             if self._fast_mode:
-                self._archive_dir = os.path.join(get_torch_home(), "{:}-simple".format(ALL_BASE_NAMES[-1]))
+                self._archive_dir = os.path.join(
+                    get_torch_home(), "{:}-simple".format(ALL_BASE_NAMES[-1])
+                )
             else:
-                file_path_or_dict = os.path.join(get_torch_home(), "{:}.{:}".format(ALL_BASE_NAMES[-1], PICKLE_EXT))
+                file_path_or_dict = os.path.join(
+                    get_torch_home(), "{:}.{:}".format(ALL_BASE_NAMES[-1], PICKLE_EXT)
+                )
             print(
                 "{:} Try to use the default NATS-Bench (size) path from "
-                "fast_mode={:} and path={:}.".format(time_string(), self._fast_mode, file_path_or_dict)
+                "fast_mode={:} and path={:}.".format(
+                    time_string(), self._fast_mode, file_path_or_dict
+                )
             )
         if isinstance(file_path_or_dict, str):
             file_path_or_dict = str(file_path_or_dict)
             if verbose:
                 print(
                     "{:} Try to create the NATS-Bench (size) api "
-                    "from {:} with fast_mode={:}".format(time_string(), file_path_or_dict, fast_mode)
+                    "from {:} with fast_mode={:}".format(
+                        time_string(), file_path_or_dict, fast_mode
+                    )
                 )
-            if not nats_is_file(file_path_or_dict) and not nats_is_dir(file_path_or_dict):
-                raise ValueError("{:} is neither a file or a dir.".format(file_path_or_dict))
+            if not nats_is_file(file_path_or_dict) and not nats_is_dir(
+                file_path_or_dict
+            ):
+                raise ValueError(
+                    "{:} is neither a file or a dir.".format(file_path_or_dict)
+                )
             self.filename = os.path.basename(file_path_or_dict)
             if fast_mode:
                 if nats_is_file(file_path_or_dict):
                     raise ValueError(
-                        "fast_mode={:} must feed the path for directory " ": {:}".format(fast_mode, file_path_or_dict)
+                        "fast_mode={:} must feed the path for directory "
+                        ": {:}".format(fast_mode, file_path_or_dict)
                     )
                 else:
                     self._archive_dir = file_path_or_dict
             else:
                 if nats_is_dir(file_path_or_dict):
                     raise ValueError(
-                        "fast_mode={:} must feed the path for file " ": {:}".format(fast_mode, file_path_or_dict)
+                        "fast_mode={:} must feed the path for file "
+                        ": {:}".format(fast_mode, file_path_or_dict)
                     )
                 else:
                     file_path_or_dict = pickle_load(file_path_or_dict)
@@ -142,31 +164,51 @@ class NATSsize(NASBenchMetaAPI):
                 hp2archres = collections.OrderedDict()
                 for hp_key, results in all_infos.items():
                     hp2archres[hp_key] = ArchResults.create_from_state_dict(results)
-                    self._avaliable_hps.add(hp_key)  # save the avaliable hyper-parameter
+                    self._avaliable_hps.add(
+                        hp_key
+                    )  # save the avaliable hyper-parameter
                 self.arch2infos_dict[xkey] = hp2archres
             self.evaluated_indexes = set(file_path_or_dict["evaluated_indexes"])
         elif self.archive_dir is not None:
-            benchmark_meta = pickle_load("{:}/meta.{:}".format(self.archive_dir, PICKLE_EXT))
+            benchmark_meta = pickle_load(
+                "{:}/meta.{:}".format(self.archive_dir, PICKLE_EXT)
+            )
             self.meta_archs = copy.deepcopy(benchmark_meta["meta_archs"])
             self.arch2infos_dict = collections.OrderedDict()
             self._avaliable_hps = set()
             self.evaluated_indexes = set()
         else:
             raise ValueError(
-                "file_path_or_dict [{:}] must be a dict or archive_dir " "must be set".format(type(file_path_or_dict))
+                "file_path_or_dict [{:}] must be a dict or archive_dir "
+                "must be set".format(type(file_path_or_dict))
             )
         self.archstr2index = {}
         for idx, arch in enumerate(self.meta_archs):
             if arch in self.archstr2index:
                 raise ValueError(
-                    "This [{:}]-th arch {:} already in the " "dict ({:}).".format(idx, arch, self.archstr2index[arch])
+                    "This [{:}]-th arch {:} already in the "
+                    "dict ({:}).".format(idx, arch, self.archstr2index[arch])
                 )
             self.archstr2index[arch] = idx
         if self.verbose:
             print(
                 "{:} Create NATS-Bench (size) done with {:}/{:} architectures "
-                "avaliable.".format(time_string(), len(self.evaluated_indexes), len(self.meta_archs))
+                "avaliable.".format(
+                    time_string(), len(self.evaluated_indexes), len(self.meta_archs)
+                )
             )
+
+    @property
+    def is_size(self):
+        return True
+
+    @property
+    def is_topology(self):
+        return False
+
+    @property
+    def full_epochs_in_paper(self):
+        return 90
 
     def query_info_str_by_arch(self, arch, hp: Text = "12"):
         """Query the information of a specific architecture.
@@ -181,10 +223,15 @@ class NATSsize(NASBenchMetaAPI):
           ArchResults instance
         """
         if self.verbose:
-            print("{:} Call query_info_str_by_arch with arch={:}" "and hp={:}".format(time_string(), arch, hp))
+            print(
+                "{:} Call query_info_str_by_arch with arch={:}"
+                "and hp={:}".format(time_string(), arch, hp)
+            )
         return self._query_info_str_by_arch(arch, hp, print_information)
 
-    def get_more_info(self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True):
+    def get_more_info(
+        self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True
+    ):
         """Return the metric for the `index`-th architecture.
 
         Args:
@@ -211,9 +258,13 @@ class NATSsize(NASBenchMetaAPI):
         if self.verbose:
             print(
                 "{:} Call the get_more_info function with index={:}, dataset={:}, "
-                "iepoch={:}, hp={:}, and is_random={:}.".format(time_string(), index, dataset, iepoch, hp, is_random)
+                "iepoch={:}, hp={:}, and is_random={:}.".format(
+                    time_string(), index, dataset, iepoch, hp, is_random
+                )
             )
-        index = self.query_index_by_arch(index)  # To avoid the input is a string or an instance of a arch object
+        index = self.query_index_by_arch(
+            index
+        )  # To avoid the input is a string or an instance of a arch object
         self._prepare_info(index)
         if index not in self.arch2infos_dict:
             raise ValueError("Did not find {:} from arch2infos_dict.".format(index))
@@ -223,7 +274,9 @@ class NATSsize(NASBenchMetaAPI):
             seeds = archresult.get_dataset_seeds(dataset)
             is_random = random.choice(seeds)
         # collect the training information
-        train_info = archresult.get_metrics(dataset, "train", iepoch=iepoch, is_random=is_random)
+        train_info = archresult.get_metrics(
+            dataset, "train", iepoch=iepoch, is_random=is_random
+        )
         total = train_info["iepoch"] + 1
         xinfo = {
             "train-loss": train_info["loss"],
@@ -233,9 +286,13 @@ class NATSsize(NASBenchMetaAPI):
         }
         # collect the evaluation information
         if dataset == "cifar10-valid":
-            valid_info = archresult.get_metrics(dataset, "x-valid", iepoch=iepoch, is_random=is_random)
+            valid_info = archresult.get_metrics(
+                dataset, "x-valid", iepoch=iepoch, is_random=is_random
+            )
             try:
-                test_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                test_info = archresult.get_metrics(
+                    dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                )
             except Exception as unused_e:  # pylint: disable=broad-except
                 test_info = None
             valtest_info = None
@@ -253,18 +310,26 @@ class NATSsize(NASBenchMetaAPI):
                 )
             try:  # collect results on the proposed test set
                 if dataset == "cifar10":
-                    test_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                    test_info = archresult.get_metrics(
+                        dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                    )
                 else:
-                    test_info = archresult.get_metrics(dataset, "x-test", iepoch=iepoch, is_random=is_random)
+                    test_info = archresult.get_metrics(
+                        dataset, "x-test", iepoch=iepoch, is_random=is_random
+                    )
             except Exception as unused_e:  # pylint: disable=broad-except
                 test_info = None
             try:  # collect results on the proposed validation set
-                valid_info = archresult.get_metrics(dataset, "x-valid", iepoch=iepoch, is_random=is_random)
+                valid_info = archresult.get_metrics(
+                    dataset, "x-valid", iepoch=iepoch, is_random=is_random
+                )
             except Exception as unused_e:  # pylint: disable=broad-except
                 valid_info = None
             try:
                 if dataset != "cifar10":
-                    valtest_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                    valtest_info = archresult.get_metrics(
+                        dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                    )
                 else:
                     valtest_info = None
             except Exception as unused_e:  # pylint: disable=broad-except

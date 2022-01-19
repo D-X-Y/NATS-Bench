@@ -95,7 +95,9 @@ def pickle_save(obj, file_path, ext=".pbz2", protocol=4):
     # with open(file_path, 'wb') as cfile:
     if _FILE_SYSTEM == "default":
         with bz2.BZ2File(str(file_path) + ext, "wb") as cfile:
-            pickle.dump(obj, cfile, protocol=protocol)  # pytype: disable=wrong-arg-types
+            pickle.dump(
+                obj, cfile, protocol=protocol
+            )  # pytype: disable=wrong-arg-types
     else:
         raise ValueError("Unknown file system lib: {:}".format(_FILE_SYSTEM))
 
@@ -133,12 +135,18 @@ def remap_dataset_set_names(dataset, metric_on_set, verbose=False):
         dataset, metric_on_set = "cifar10", "ori-test"
     elif dataset == "cifar10" and metric_on_set == "train":
         dataset, metric_on_set = "cifar10", "train"
-    elif (dataset == "cifar100" or dataset == "ImageNet16-120") and metric_on_set == "valid":
+    elif (
+        dataset == "cifar100" or dataset == "ImageNet16-120"
+    ) and metric_on_set == "valid":
         metric_on_set = "x-valid"
-    elif (dataset == "cifar100" or dataset == "ImageNet16-120") and metric_on_set == "test":
+    elif (
+        dataset == "cifar100" or dataset == "ImageNet16-120"
+    ) and metric_on_set == "test":
         metric_on_set = "x-test"
     if verbose:
-        print("  return dataset={:} and metric_on_set={:}".format(dataset, metric_on_set))
+        print(
+            "  return dataset={:} and metric_on_set={:}".format(dataset, metric_on_set)
+        )
     return dataset, metric_on_set
 
 
@@ -172,19 +180,24 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         if self.verbose:
             print("Call the arch function with index={:}".format(index))
         if index < 0 or index >= len(self.meta_archs):
-            raise ValueError("invalid index : {:} vs. {:}.".format(index, len(self.meta_archs)))
+            raise ValueError(
+                "invalid index : {:} vs. {:}.".format(index, len(self.meta_archs))
+            )
         return copy.deepcopy(self.meta_archs[index])
 
     def __len__(self):
         return len(self.meta_archs)
 
     def __repr__(self):
-        return "{name}({num}/{total} architectures, fast_mode={fast_mode}, " "file={filename})".format(
-            name=self.__class__.__name__,
-            num=len(self.evaluated_indexes),
-            total=len(self.meta_archs),
-            fast_mode=self.fast_mode,
-            filename=self.filename,
+        return (
+            "{name}({num}/{total} architectures, fast_mode={fast_mode}, "
+            "file={filename})".format(
+                name=self.__class__.__name__,
+                num=len(self.evaluated_indexes),
+                total=len(self.meta_archs),
+                fast_mode=self.fast_mode,
+                filename=self.filename,
+            )
         )
 
     @property
@@ -221,24 +234,39 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         self._used_time = 0
 
     @abc.abstractmethod
-    def get_more_info(self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True):
+    def get_more_info(
+        self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True
+    ):
         """Return the metric for the `index`-th architecture."""
 
-    def simulate_train_eval(self, arch, dataset, iepoch=None, hp="12", account_time=True):
+    def simulate_train_eval(
+        self, arch, dataset, iepoch=None, hp="12", account_time=True
+    ):
         """This function is used to simulate training and evaluating an arch."""
         index = self.query_index_by_arch(arch)
         all_names = ("cifar10", "cifar100", "ImageNet16-120")
         if dataset not in all_names:
-            raise ValueError("Invalid dataset name : {:} vs {:}".format(dataset, all_names))
+            raise ValueError(
+                "Invalid dataset name : {:} vs {:}".format(dataset, all_names)
+            )
         if dataset == "cifar10":
-            info = self.get_more_info(index, "cifar10-valid", iepoch=iepoch, hp=hp, is_random=True)
+            info = self.get_more_info(
+                index, "cifar10-valid", iepoch=iepoch, hp=hp, is_random=True
+            )
         else:
-            info = self.get_more_info(index, dataset, iepoch=iepoch, hp=hp, is_random=True)
+            info = self.get_more_info(
+                index, dataset, iepoch=iepoch, hp=hp, is_random=True
+            )
         if "valid-accuracy" in info:
-            valid_acc, time_cost = info["valid-accuracy"], info["train-all-time"] + info["valid-per-time"]
+            valid_acc, time_cost = (
+                info["valid-accuracy"],
+                info["train-all-time"] + info["valid-per-time"],
+            )
         else:
             valid_acc = info["valtest-accuracy"]
-            temp_info = self.get_more_info(index, dataset, iepoch=None, hp=hp, is_random=True)
+            temp_info = self.get_more_info(
+                index, dataset, iepoch=None, hp=hp, is_random=True
+            )
             time_cost = info["train-all-time"] + temp_info["valid-per-time"]
         latency = self.get_latency(index, dataset)
         if account_time:
@@ -259,10 +287,14 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         """
         if self.verbose:
             print(
-                "{:} Call clear_params with archive_root={:} and index={:}".format(time_string(), archive_root, index)
+                "{:} Call clear_params with archive_root={:} and index={:}".format(
+                    time_string(), archive_root, index
+                )
             )
         if archive_root is None:
-            archive_root = os.path.join(os.environ["TORCH_HOME"], "{:}-full".format(self._all_base_names[-1]))
+            archive_root = os.path.join(
+                os.environ["TORCH_HOME"], "{:}-full".format(self._all_base_names[-1])
+            )
             if not nats_is_dir(archive_root):
                 warnings.warn(
                     "The input archive_root is None and the default "
@@ -277,14 +309,24 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         else:
             indexes = [index]
         for idx in indexes:
-            if not (0 <= idx < len(self.meta_archs)):  # pylint: disable=superfluous-parens
+            if not (
+                0 <= idx < len(self.meta_archs)
+            ):  # pylint: disable=superfluous-parens
                 raise ValueError("invalid index of {:}".format(idx))
-            xfile_path = os.path.join(archive_root, "{:06d}.{:}".format(idx, PICKLE_EXT))
+            xfile_path = os.path.join(
+                archive_root, "{:06d}.{:}".format(idx, PICKLE_EXT)
+            )
             if not nats_is_file(xfile_path):
-                xfile_path = os.path.join(archive_root, "{:d}.{:}".format(idx, PICKLE_EXT))
-            assert nats_is_file(xfile_path), "invalid data path : {:}".format(xfile_path)
+                xfile_path = os.path.join(
+                    archive_root, "{:d}.{:}".format(idx, PICKLE_EXT)
+                )
+            assert nats_is_file(xfile_path), "invalid data path : {:}".format(
+                xfile_path
+            )
             xdata = pickle_load(xfile_path)
-            assert isinstance(xdata, dict), "invalid format of data in {:}".format(xfile_path)
+            assert isinstance(xdata, dict), "invalid format of data in {:}".format(
+                xfile_path
+            )
             self.evaluated_indexes.add(idx)
             hp2archres = collections.OrderedDict()
             for hp_key, results in xdata.items():
@@ -314,12 +356,18 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
           The index of the architcture in this benchmark.
         """
         if self.verbose:
-            print("{:} Call query_index_by_arch with arch={:}".format(time_string(), arch))
+            print(
+                "{:} Call query_index_by_arch with arch={:}".format(time_string(), arch)
+            )
         if isinstance(arch, int):
             if 0 <= arch < len(self):
                 return arch
             else:
-                raise ValueError("Invalid architecture index {:} vs [{:}, {:}].".format(arch, 0, len(self)))
+                raise ValueError(
+                    "Invalid architecture index {:} vs [{:}, {:}].".format(
+                        arch, 0, len(self)
+                    )
+                )
         elif isinstance(arch, str):
             if arch in self.archstr2index:
                 arch_index = self.archstr2index[arch]
@@ -351,12 +399,14 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                     )
             else:
                 raise ValueError(
-                    "Invalid status: fast_mode={:} and " "archive_dir={:}".format(self.fast_mode, self.archive_dir)
+                    "Invalid status: fast_mode={:} and "
+                    "archive_dir={:}".format(self.fast_mode, self.archive_dir)
                 )
         else:
             if index not in self.evaluated_indexes:
                 raise ValueError(
-                    "The index of {:} is not in self.evaluated_indexes, " "there must be something wrong.".format(index)
+                    "The index of {:} is not in self.evaluated_indexes, "
+                    "there must be something wrong.".format(index)
                 )
             if self.verbose:
                 print(
@@ -376,10 +426,15 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                  arch2infos_dict[index][hp].
         """
         if self.verbose:
-            print("{:} Call clear_params with index={:} and hp={:}".format(time_string(), index, hp))
+            print(
+                "{:} Call clear_params with index={:} and hp={:}".format(
+                    time_string(), index, hp
+                )
+            )
         if index not in self.arch2infos_dict:
             warnings.warn(
-                "The {:}-th architecture is not in the benchmark data yet, " "no need to clear params.".format(index)
+                "The {:}-th architecture is not in the benchmark data yet, "
+                "no need to clear params.".format(index)
             )
         elif hp is None:
             for key, result in self.arch2infos_dict[index].items():
@@ -388,7 +443,9 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             if str(hp) not in self.arch2infos_dict[index]:
                 raise ValueError(
                     "The {:}-th architecture only has hyper-parameters "
-                    "of {:} instead of {:}.".format(index, list(self.arch2infos_dict[index].keys()), hp)
+                    "of {:} instead of {:}.".format(
+                        index, list(self.arch2infos_dict[index].keys()), hp
+                    )
                 )
             self.arch2infos_dict[index][str(hp)].clear_params()
 
@@ -404,32 +461,47 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             if hp not in self.arch2infos_dict[arch_index]:
                 raise ValueError(
                     "The {:}-th architecture only has hyper-parameters of "
-                    "{:} instead of {:}.".format(arch_index, list(self.arch2infos_dict[arch_index].keys()), hp)
+                    "{:} instead of {:}.".format(
+                        arch_index, list(self.arch2infos_dict[arch_index].keys()), hp
+                    )
                 )
             info = self.arch2infos_dict[arch_index][hp]
             strings = print_information(info, "arch-index={:}".format(arch_index))
             return "\n".join(strings)
         else:
-            warnings.warn("Find this arch-index : {:}, but this arch is not " "evaluated.".format(arch_index))
+            warnings.warn(
+                "Find this arch-index : {:}, but this arch is not "
+                "evaluated.".format(arch_index)
+            )
             return None
 
     def query_meta_info_by_index(self, arch_index, hp: Text = "12"):
         """Return ArchResults for the 'arch_index'-th architecture."""
         if self.verbose:
-            print("Call query_meta_info_by_index with arch_index={:}, hp={:}".format(arch_index, hp))
+            print(
+                "Call query_meta_info_by_index with arch_index={:}, hp={:}".format(
+                    arch_index, hp
+                )
+            )
         self._prepare_info(arch_index)
         if arch_index in self.arch2infos_dict:
             if str(hp) not in self.arch2infos_dict[arch_index]:
                 raise ValueError(
                     "The {:}-th architecture only has hyper-parameters of "
-                    "{:} instead of {:}.".format(arch_index, list(self.arch2infos_dict[arch_index].keys()), hp)
+                    "{:} instead of {:}.".format(
+                        arch_index, list(self.arch2infos_dict[arch_index].keys()), hp
+                    )
                 )
             info = self.arch2infos_dict[arch_index][str(hp)]
         else:
-            raise ValueError("arch_index [{:}] does not in arch2infos".format(arch_index))
+            raise ValueError(
+                "arch_index [{:}] does not in arch2infos".format(arch_index)
+            )
         return copy.deepcopy(info)
 
-    def query_by_index(self, arch_index: int, dataname: Union[None, Text] = None, hp: Text = "12"):
+    def query_by_index(
+        self, arch_index: int, dataname: Union[None, Text] = None, hp: Text = "12"
+    ):
         """Query the information with the training of 01/12/90/200 epochs.
 
         Args:
@@ -467,11 +539,21 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             return info
         else:
             if dataname not in info.get_dataset_names():
-                raise ValueError("invalid dataset-name : {:} vs. {:}".format(dataname, info.get_dataset_names()))
+                raise ValueError(
+                    "invalid dataset-name : {:} vs. {:}".format(
+                        dataname, info.get_dataset_names()
+                    )
+                )
             return info.query(dataname)
 
     def find_best(
-        self, dataset, metric_on_set, flop_max=None, param_max=None, hp: Text = "12", enforce_all: bool = True
+        self,
+        dataset,
+        metric_on_set,
+        flop_max=None,
+        param_max=None,
+        hp: Text = "12",
+        enforce_all: bool = True,
     ):
         """Find the architecture with the highest accuracy based on some constraints."""
         # Please see how to set the `dataset` and `metric_on_set` (setname) at here:
@@ -483,7 +565,9 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                     time_string(), dataset, metric_on_set, hp, flop_max, param_max
                 )
             )
-        dataset, metric_on_set = remap_dataset_set_names(dataset, metric_on_set, self.verbose)
+        dataset, metric_on_set = remap_dataset_set_names(
+            dataset, metric_on_set, self.verbose
+        )
         best_index, highest_accuracy = -1, None
         if enforce_all:
             # We set this arg `enforce_all` because in the fast mode, evaluated_indexes will be empty
@@ -503,7 +587,9 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 continue
             if param_max is not None and param > param_max:
                 continue
-            xinfo = arch_info.get_metrics(dataset, metric_on_set)  # the information of loss and accuracy
+            xinfo = arch_info.get_metrics(
+                dataset, metric_on_set
+            )  # the information of loss and accuracy
             loss, accuracy = xinfo["loss"], xinfo["accuracy"]
             if best_index == -1:
                 best_index, highest_accuracy = arch_index, accuracy
@@ -512,7 +598,9 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             del latency, loss
         if self.verbose:
             if not evaluated_indexes:
-                print("The evaluated_indexes is empty, please fill it before call find_best.")
+                print(
+                    "The evaluated_indexes is empty, please fill it before call find_best."
+                )
             else:
                 print(
                     "  the best architecture : [{:}] {:} with accuracy={:.3f}%".format(
@@ -574,13 +662,17 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         if index in self.arch2infos_dict:
             info = self.arch2infos_dict[index]
         else:
-            raise ValueError("The arch_index={:} is not in arch2infos_dict.".format(index))
+            raise ValueError(
+                "The arch_index={:} is not in arch2infos_dict.".format(index)
+            )
         info = next(iter(info.values()))
         results = info.query(dataset, None)
         results = next(iter(results.values()))
         return results.get_config(None)
 
-    def get_cost_info(self, index: int, dataset: Text, hp: Text = "12") -> Dict[Text, float]:
+    def get_cost_info(
+        self, index: int, dataset: Text, hp: Text = "12"
+    ) -> Dict[Text, float]:
         """To obtain the cost metric for the `index`-th architecture on a dataset."""
         if self.verbose:
             print(
@@ -639,7 +731,11 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 print("arch : {:}".format(self.meta_archs[idx]))
                 for unused_key, result in self.arch2infos_dict[index].items():
                     strings = print_information(result)
-                    print(">" * 40 + " {:03d} epochs ".format(result.get_total_epoch()) + ">" * 40)
+                    print(
+                        ">" * 40
+                        + " {:03d} epochs ".format(result.get_total_epoch())
+                        + ">" * 40
+                    )
                     print("\n".join(strings))
                 print("<" * 40 + "------------" + "<" * 40)
         else:
@@ -647,21 +743,36 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 if index not in self.evaluated_indexes:
                     self._prepare_info(index)
                 if index not in self.evaluated_indexes:
-                    print("The {:}-th architecture has not been evaluated " "or not saved.".format(index))
+                    print(
+                        "The {:}-th architecture has not been evaluated "
+                        "or not saved.".format(index)
+                    )
                 else:
                     # arch_info = self.arch2infos_dict[index]
                     for unused_key, result in self.arch2infos_dict[index].items():
                         strings = print_information(result)
-                        print(">" * 40 + " {:03d} epochs ".format(result.get_total_epoch()) + ">" * 40)
+                        print(
+                            ">" * 40
+                            + " {:03d} epochs ".format(result.get_total_epoch())
+                            + ">" * 40
+                        )
                         print("\n".join(strings))
                     print("<" * 40 + "------------" + "<" * 40)
             else:
-                print("This index ({:}) is out of range (0~{:}).".format(index, len(self.meta_archs)))
+                print(
+                    "This index ({:}) is out of range (0~{:}).".format(
+                        index, len(self.meta_archs)
+                    )
+                )
 
     def statistics(self, dataset: Text, hp: Union[Text, int]) -> Dict[int, int]:
         """This function will count the number of total trials."""
         if self.verbose:
-            print("Call the statistics function with dataset={:} and hp={:}.".format(dataset, hp))
+            print(
+                "Call the statistics function with dataset={:} and hp={:}.".format(
+                    dataset, hp
+                )
+            )
         valid_datasets = ["cifar10-valid", "cifar10", "cifar100", "ImageNet16-120"]
         if dataset not in valid_datasets:
             raise ValueError("{:} not in {:}".format(dataset, valid_datasets))
@@ -703,7 +814,11 @@ class ArchResults(object):
             for key, value in time_info.items():
                 time_infos[key].append(value)
 
-        info = {"flops": np.mean(flops), "params": np.mean(params), "latency": mean_latency}
+        info = {
+            "flops": np.mean(flops),
+            "params": np.mean(params),
+            "latency": mean_latency,
+        }
         for key, value in time_infos.items():
             if len(value) and value[0] is not None:
                 info[key] = np.mean(value)
@@ -774,7 +889,9 @@ class ArchResults(object):
                     return_info[key] = None
         elif isinstance(is_random, int):  # specify the seed
             if is_random not in x_seeds:
-                raise ValueError("can not find random seed ({:}) from {:}".format(is_random, x_seeds))
+                raise ValueError(
+                    "can not find random seed ({:}) from {:}".format(is_random, x_seeds)
+                )
             index = x_seeds.index(is_random)
             for key, value in infos.items():
                 return_info[key] = value[index]
@@ -804,15 +921,22 @@ class ArchResults(object):
         """
         if seed is None:
             x_seeds = self.dataset_seed[dataset]
-            return {seed: self.all_results[(dataset, seed)].get_net_param() for seed in x_seeds}
+            return {
+                seed: self.all_results[(dataset, seed)].get_net_param()
+                for seed in x_seeds
+            }
         else:
             xkey = (dataset, seed)
             if xkey in self.all_results:
                 return self.all_results[xkey].get_net_param()
             else:
-                raise ValueError("key={:} not in {:}".format(xkey, list(self.all_results.keys())))
+                raise ValueError(
+                    "key={:} not in {:}".format(xkey, list(self.all_results.keys()))
+                )
 
-    def reset_latency(self, dataset: Text, seed: Union[None, Text], latency: float) -> None:
+    def reset_latency(
+        self, dataset: Text, seed: Union[None, Text], latency: float
+    ) -> None:
         """This function is used to reset the latency in all corresponding ResultsCount(s)."""
         if seed is None:
             for seed in self.dataset_seed[dataset]:
@@ -820,23 +944,37 @@ class ArchResults(object):
         else:
             self.all_results[(dataset, seed)].update_latency([latency])
 
-    def reset_pseudo_train_times(self, dataset: Text, seed: Union[None, Text], estimated_per_epoch_time: float) -> None:
+    def reset_pseudo_train_times(
+        self, dataset: Text, seed: Union[None, Text], estimated_per_epoch_time: float
+    ) -> None:
         """This function is used to reset the train-times in all corresponding ResultsCount(s)."""
         if seed is None:
             for seed in self.dataset_seed[dataset]:
-                self.all_results[(dataset, seed)].reset_pseudo_train_times(estimated_per_epoch_time)
+                self.all_results[(dataset, seed)].reset_pseudo_train_times(
+                    estimated_per_epoch_time
+                )
         else:
-            self.all_results[(dataset, seed)].reset_pseudo_train_times(estimated_per_epoch_time)
+            self.all_results[(dataset, seed)].reset_pseudo_train_times(
+                estimated_per_epoch_time
+            )
 
     def reset_pseudo_eval_times(
-        self, dataset: Text, seed: Union[None, Text], eval_name: Text, estimated_per_epoch_time: float
+        self,
+        dataset: Text,
+        seed: Union[None, Text],
+        eval_name: Text,
+        estimated_per_epoch_time: float,
     ) -> None:
         """This function is used to reset the eval-times in all corresponding ResultsCount(s)."""
         if seed is None:
             for seed in self.dataset_seed[dataset]:
-                self.all_results[(dataset, seed)].reset_pseudo_eval_times(eval_name, estimated_per_epoch_time)
+                self.all_results[(dataset, seed)].reset_pseudo_eval_times(
+                    eval_name, estimated_per_epoch_time
+                )
         else:
-            self.all_results[(dataset, seed)].reset_pseudo_eval_times(eval_name, estimated_per_epoch_time)
+            self.all_results[(dataset, seed)].reset_pseudo_eval_times(
+                eval_name, estimated_per_epoch_time
+            )
 
     def get_latency(self, dataset: Text) -> float:
         """Get the latency of a model on the target dataset."""
@@ -844,7 +982,11 @@ class ArchResults(object):
         for seed in self.dataset_seed[dataset]:
             latency = self.all_results[(dataset, seed)].get_latency()
             if not isinstance(latency, float) or latency <= 0:
-                raise ValueError("invalid latency of {:} with seed={:} : {:}".format(dataset, seed, latency))
+                raise ValueError(
+                    "invalid latency of {:} with seed={:} : {:}".format(
+                        dataset, seed, latency
+                    )
+                )
             latencies.append(latency)
         return sum(latencies) / len(latencies)
 
@@ -853,14 +995,23 @@ class ArchResults(object):
         if dataset is None:
             epochss = []
             for xdata, x_seeds in self.dataset_seed.items():
-                epochss += [self.all_results[(xdata, seed)].get_total_epoch() for seed in x_seeds]
+                epochss += [
+                    self.all_results[(xdata, seed)].get_total_epoch()
+                    for seed in x_seeds
+                ]
         elif isinstance(dataset, str):
             x_seeds = self.dataset_seed[dataset]
-            epochss = [self.all_results[(dataset, seed)].get_total_epoch() for seed in x_seeds]
+            epochss = [
+                self.all_results[(dataset, seed)].get_total_epoch() for seed in x_seeds
+            ]
         else:
             raise ValueError("invalid dataset={:}".format(dataset))
         if len(set(epochss)) > 1:
-            raise ValueError("Each trial mush have the same number of training epochs : {:}".format(epochss))
+            raise ValueError(
+                "Each trial mush have the same number of training epochs : {:}".format(
+                    epochss
+                )
+            )
         return epochss[-1]
 
     def query(self, dataset, seed=None):
@@ -880,7 +1031,9 @@ class ArchResults(object):
             self.dataset_seed[dataset_name] = []
         if seed in self.dataset_seed[dataset_name]:
             raise ValueError(
-                "{:}-th arch alreadly has this seed ({:}) on {:}".format(self.arch_index, seed, dataset_name)
+                "{:}-th arch alreadly has this seed ({:}) on {:}".format(
+                    self.arch_index, seed, dataset_name
+                )
             )
         self.dataset_seed[dataset_name].append(seed)
         self.dataset_seed[dataset_name] = sorted(self.dataset_seed[dataset_name])
@@ -895,10 +1048,16 @@ class ArchResults(object):
             if key == "all_results":  # contain the class of ResultsCount
                 xvalue = dict()
                 if not isinstance(value, dict):
-                    raise ValueError("invalid type of value for {:} : {:}".format(key, type(value)))
+                    raise ValueError(
+                        "invalid type of value for {:} : {:}".format(key, type(value))
+                    )
                 for cur_k, cur_v in value.items():
                     if not isinstance(cur_v, ResultsCount):
-                        raise ValueError("invalid type of value for {:}/{:} : {:}".format(key, cur_k, type(cur_v)))
+                        raise ValueError(
+                            "invalid type of value for {:}/{:} : {:}".format(
+                                key, cur_k, type(cur_v)
+                            )
+                        )
                     xvalue[cur_k] = cur_v.state_dict()
             else:
                 xvalue = value
@@ -912,7 +1071,9 @@ class ArchResults(object):
             if key == "all_results":  # To convert to the class of ResultsCount
                 xvalue = dict()
                 if not isinstance(value, dict):
-                    raise ValueError("invalid type of value for {:} : {:}".format(key, type(value)))
+                    raise ValueError(
+                        "invalid type of value for {:} : {:}".format(key, type(value))
+                    )
                 for cur_k, cur_v in value.items():
                     xvalue[cur_k] = ResultsCount.create_from_state_dict(cur_v)
             else:
@@ -929,7 +1090,11 @@ class ArchResults(object):
         elif isinstance(state_dict_or_file, dict):
             state_dict = state_dict_or_file
         else:
-            raise ValueError("invalid type of state_dict_or_file : {:}".format(type(state_dict_or_file)))
+            raise ValueError(
+                "invalid type of state_dict_or_file : {:}".format(
+                    type(state_dict_or_file)
+                )
+            )
         x.load_state_dict(state_dict)
         return x
 
@@ -946,26 +1111,43 @@ class ArchResults(object):
         all_dataset = ["cifar10-valid", "cifar10", "cifar100", "ImageNet16-120"]
         for dataset in all_dataset:
             print("---->>>> {:}".format(dataset))
-            print("The latency on {:} is {:} s".format(dataset, self.get_latency(dataset)))
+            print(
+                "The latency on {:} is {:} s".format(dataset, self.get_latency(dataset))
+            )
             for seed in self.dataset_seed[dataset]:
                 result = self.all_results[(dataset, seed)]
                 print("  ==>> result = {:}".format(result))
                 print("  ==>> cost = {:}".format(result.get_times()))
 
     def __repr__(self):
-        return "{name}(arch-index={index}, arch={arch}, " "{num} runs, clear={clear})".format(
-            name=self.__class__.__name__,
-            index=self.arch_index,
-            arch=self.arch_str,
-            num=len(self.all_results),
-            clear=self.clear_net_done,
+        return (
+            "{name}(arch-index={index}, arch={arch}, "
+            "{num} runs, clear={clear})".format(
+                name=self.__class__.__name__,
+                index=self.arch_index,
+                arch=self.arch_str,
+                num=len(self.all_results),
+                clear=self.clear_net_done,
+            )
         )
 
 
 class ResultsCount(object):
     """ResultsCount is to save the information of one trial for a single architecture."""
 
-    def __init__(self, name, state_dict, train_accs, train_losses, params, flop, arch_config, seed, epochs, latency):
+    def __init__(
+        self,
+        name,
+        state_dict,
+        train_accs,
+        train_losses,
+        params,
+        flop,
+        arch_config,
+        seed,
+        epochs,
+        latency,
+    ):
         self.name = name
         self.net_state_dict = state_dict
         self.train_acc1es = copy.deepcopy(train_accs)
@@ -981,7 +1163,9 @@ class ResultsCount(object):
         # evaluation results
         self.reset_eval()
 
-    def update_train_info(self, train_acc1es, train_acc5es, train_losses, train_times) -> None:
+    def update_train_info(
+        self, train_acc1es, train_acc5es, train_losses, train_times
+    ) -> None:
         self.train_acc1es = train_acc1es
         self.train_acc5es = train_acc5es
         self.train_losses = train_losses
@@ -994,7 +1178,9 @@ class ResultsCount(object):
             train_times[i] = estimated_per_epoch_time
         self.train_times = train_times
 
-    def reset_pseudo_eval_times(self, eval_name: Text, estimated_per_epoch_time: float) -> None:
+    def reset_pseudo_eval_times(
+        self, eval_name: Text, estimated_per_epoch_time: float
+    ) -> None:
         """Assign the evaluation times."""
         if eval_name not in self.eval_names:
             raise ValueError("invalid eval name : {:}".format(eval_name))
@@ -1024,7 +1210,9 @@ class ResultsCount(object):
         data_names = set([x.split("@")[0] for x in accs.keys()])
         for data_name in data_names:
             if data_name in self.eval_names:
-                raise ValueError("{:} has already been added into " "eval-names".format(data_name))
+                raise ValueError(
+                    "{:} has already been added into " "eval-names".format(data_name)
+                )
             self.eval_names.append(data_name)
             for iepoch in range(self.epochs):
                 xkey = "{:}@{:}".format(data_name, iepoch)
@@ -1066,12 +1254,18 @@ class ResultsCount(object):
         """Obtain the information regarding both training and evaluation time."""
         if self.train_times is not None and isinstance(self.train_times, dict):
             train_times = list(self.train_times.values())
-            time_info = {"T-train@epoch": np.mean(train_times), "T-train@total": np.sum(train_times)}
+            time_info = {
+                "T-train@epoch": np.mean(train_times),
+                "T-train@total": np.sum(train_times),
+            }
         else:
             time_info = {"T-train@epoch": None, "T-train@total": None}
         for name in self.eval_names:
             try:
-                xtimes = [self.eval_times["{:}@{:}".format(name, i)] for i in range(self.epochs)]
+                xtimes = [
+                    self.eval_times["{:}@{:}".format(name, i)]
+                    for i in range(self.epochs)
+                ]
                 time_info["T-{:}@epoch".format(name)] = np.mean(xtimes)
                 time_info["T-{:}@total".format(name)] = np.sum(xtimes)
             except Exception as unused_e:  # pylint: disable=broad-except
@@ -1116,8 +1310,15 @@ class ResultsCount(object):
                 if key in self.eval_times:
                     xtime = self.eval_times[key]
                 else:
-                    raise ValueError("{:} not in {:}".format(key, self.eval_times.keys()))
-                atime = sum([self.eval_times["{:}@{:}".format(xname, i)] for i in range(iepoch + 1)])
+                    raise ValueError(
+                        "{:} not in {:}".format(key, self.eval_times.keys())
+                    )
+                atime = sum(
+                    [
+                        self.eval_times["{:}@{:}".format(xname, i)]
+                        for i in range(iepoch + 1)
+                    ]
+                )
             else:
                 xtime, atime = None, None
             return {
@@ -1143,7 +1344,10 @@ class ResultsCount(object):
         """This function is used to obtain the config dict for this architecture."""
         if str2structure is None:
             # In this case, this is an arch in size search space of NATS-BENCH.
-            if "name" in self.arch_config and self.arch_config["name"] == "infer.shape.tiny":
+            if (
+                "name" in self.arch_config
+                and self.arch_config["name"] == "infer.shape.tiny"
+            ):
                 return {
                     "name": "infer.shape.tiny",
                     "channels": self.arch_config["channels"],
@@ -1159,7 +1363,10 @@ class ResultsCount(object):
                     "num_classes": self.arch_config["class_num"],
                 }
         else:  # This is an arch in the size search space of NATS-BENCH.
-            if "name" in self.arch_config and self.arch_config["name"] == "infer.shape.tiny":
+            if (
+                "name" in self.arch_config
+                and self.arch_config["name"] == "infer.shape.tiny"
+            ):
                 return {
                     "name": "infer.shape.tiny",
                     "channels": self.arch_config["channels"],

@@ -58,7 +58,16 @@ def create(file_path_or_dict, search_space, fast_mode=False, verbose=True):
 def search_space_info(main_tag: Text, aux_tag: Optional[Text]):
     """Obtain the search space information."""
     nats_sss = dict(candidates=[8, 16, 24, 32, 40, 48, 56, 64], num_layers=5)
-    nats_tss = dict(op_names=["none", "skip_connect", "nor_conv_1x1", "nor_conv_3x3", "avg_pool_3x3"], num_nodes=4)
+    nats_tss = dict(
+        op_names=[
+            "none",
+            "skip_connect",
+            "nor_conv_1x1",
+            "nor_conv_3x3",
+            "avg_pool_3x3",
+        ],
+        num_nodes=4,
+    )
     if main_tag == "nats-bench":
         if aux_tag in NATS_BENCH_SSS_NAMEs:
             return nats_sss

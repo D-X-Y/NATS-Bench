@@ -14,9 +14,9 @@ class TopologyStructure:
     """A class to describe the topology, especially that used in NATS-Bench."""
 
     def __init__(self, genotype):
-        assert isinstance(genotype, list) or isinstance(genotype, tuple), "invalid class of genotype : {:}".format(
-            type(genotype)
-        )
+        assert isinstance(genotype, list) or isinstance(
+            genotype, tuple
+        ), "invalid class of genotype : {:}".format(type(genotype))
         self.node_num = len(genotype) + 1
         self.nodes = []
         self.node_N = []
@@ -26,10 +26,12 @@ class TopologyStructure:
             ), "invalid class of node_info : {:}".format(type(node_info))
             assert len(node_info) >= 1, "invalid length : {:}".format(len(node_info))
             for node_in in node_info:
-                assert isinstance(node_in, list) or isinstance(node_in, tuple), "invalid class of in-node : {:}".format(
-                    type(node_in)
-                )
-                assert len(node_in) == 2 and node_in[1] <= idx, "invalid in-node : {:}".format(node_in)
+                assert isinstance(node_in, list) or isinstance(
+                    node_in, tuple
+                ), "invalid class of in-node : {:}".format(type(node_in))
+                assert (
+                    len(node_in) == 2 and node_in[1] <= idx
+                ), "invalid in-node : {:}".format(node_in)
             self.node_N.append(len(node_info))
             self.nodes.append(tuple(deepcopy(node_info)))
 
@@ -48,7 +50,9 @@ class TopologyStructure:
         return genotypes, True
 
     def node(self, index):
-        assert index > 0 and index <= len(self), "invalid index={:} < {:}".format(index, len(self))
+        assert index > 0 and index <= len(self), "invalid index={:} < {:}".format(
+            index, len(self)
+        )
         return self.nodes[index]
 
     def tostr(self):
@@ -120,13 +124,17 @@ class TopologyStructure:
     def str2structure(xstr):
         if isinstance(xstr, TopologyStructure):
             return xstr
-        assert isinstance(xstr, str), "must take string (not {:}) as input".format(type(xstr))
+        assert isinstance(xstr, str), "must take string (not {:}) as input".format(
+            type(xstr)
+        )
         nodestrs = xstr.split("+")
         genotypes = []
         for i, node_str in enumerate(nodestrs):
             inputs = list(filter(lambda x: x != "", node_str.split("|")))
             for xinput in inputs:
-                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(xinput)
+                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(
+                    xinput
+                )
             inputs = (xi.split("~") for xi in inputs)
             input_infos = tuple((op, int(IDX)) for (op, IDX) in inputs)
             genotypes.append(input_infos)
@@ -134,13 +142,17 @@ class TopologyStructure:
 
     @staticmethod
     def str2fullstructure(xstr, default_name="none"):
-        assert isinstance(xstr, str), "must take string (not {:}) as input".format(type(xstr))
+        assert isinstance(xstr, str), "must take string (not {:}) as input".format(
+            type(xstr)
+        )
         nodestrs = xstr.split("+")
         genotypes = []
         for i, node_str in enumerate(nodestrs):
             inputs = list(filter(lambda x: x != "", node_str.split("|")))
             for xinput in inputs:
-                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(xinput)
+                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(
+                    xinput
+                )
             inputs = (xi.split("~") for xi in inputs)
             input_infos = list((op, int(IDX)) for (op, IDX) in inputs)
             all_in_nodes = list(x[1] for x in input_infos)
@@ -156,7 +168,11 @@ class TopologyStructure:
         assert isinstance(search_space, list) or isinstance(
             search_space, tuple
         ), "invalid class of search-space : {:}".format(type(search_space))
-        assert num >= 2, "There should be at least two nodes in a neural cell instead of {:}".format(num)
+        assert (
+            num >= 2
+        ), "There should be at least two nodes in a neural cell instead of {:}".format(
+            num
+        )
         all_archs = get_combination(search_space, 1)
         for i, arch in enumerate(all_archs):
             all_archs[i] = [tuple(arch)]

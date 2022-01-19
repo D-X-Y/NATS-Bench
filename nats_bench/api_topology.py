@@ -35,7 +35,10 @@ ALL_BASE_NAMES = ["NATS-tss-v1_0-3ffb9"]
 def print_information(information, extra_info=None, show=False):
     """print out the information of a given ArchResults."""
     dataset_names = information.get_dataset_names()
-    strings = [information.arch_str, "datasets : {:}, extra-info : {:}".format(dataset_names, extra_info)]
+    strings = [
+        information.arch_str,
+        "datasets : {:}, extra-info : {:}".format(dataset_names, extra_info),
+    ]
 
     def metric2str(loss, acc):
         return "loss = {:.3f} & top1 = {:.2f}%".format(loss, acc)
@@ -44,7 +47,12 @@ def print_information(information, extra_info=None, show=False):
         metric = information.get_compute_costs(dataset)
         flop, param, latency = metric["flops"], metric["params"], metric["latency"]
         str1 = "{:14s} FLOP={:6.2f} M, Params={:.3f} MB, latency={:} ms.".format(
-            dataset, flop, param, "{:.2f}".format(latency * 1000) if latency is not None and latency > 0 else None
+            dataset,
+            flop,
+            param,
+            "{:.2f}".format(latency * 1000)
+            if latency is not None and latency > 0
+            else None,
         )
         train_info = information.get_metrics(dataset, "train")
         if dataset == "cifar10-valid":
@@ -95,34 +103,48 @@ class NATStopology(NASBenchMetaAPI):
         self.reset_time()
         if file_path_or_dict is None:
             if self._fast_mode:
-                self._archive_dir = os.path.join(get_torch_home(), "{:}-simple".format(ALL_BASE_NAMES[-1]))
+                self._archive_dir = os.path.join(
+                    get_torch_home(), "{:}-simple".format(ALL_BASE_NAMES[-1])
+                )
             else:
-                file_path_or_dict = os.path.join(get_torch_home(), "{:}.{:}".format(ALL_BASE_NAMES[-1], PICKLE_EXT))
+                file_path_or_dict = os.path.join(
+                    get_torch_home(), "{:}.{:}".format(ALL_BASE_NAMES[-1], PICKLE_EXT)
+                )
             print(
                 "{:} Try to use the default NATS-Bench (topology) path from "
-                "fast_mode={:} and path={:}.".format(time_string(), self._fast_mode, file_path_or_dict)
+                "fast_mode={:} and path={:}.".format(
+                    time_string(), self._fast_mode, file_path_or_dict
+                )
             )
         if isinstance(file_path_or_dict, str):
             file_path_or_dict = str(file_path_or_dict)
             if verbose:
                 print(
                     "{:} Try to create the NATS-Bench (topology) api "
-                    "from {:} with fast_mode={:}".format(time_string(), file_path_or_dict, fast_mode)
+                    "from {:} with fast_mode={:}".format(
+                        time_string(), file_path_or_dict, fast_mode
+                    )
                 )
-            if not nats_is_file(file_path_or_dict) and not nats_is_dir(file_path_or_dict):
-                raise ValueError("{:} is neither a file or a dir.".format(file_path_or_dict))
+            if not nats_is_file(file_path_or_dict) and not nats_is_dir(
+                file_path_or_dict
+            ):
+                raise ValueError(
+                    "{:} is neither a file or a dir.".format(file_path_or_dict)
+                )
             self.filename = os.path.basename(file_path_or_dict)
             if fast_mode:
                 if nats_is_file(file_path_or_dict):
                     raise ValueError(
-                        "fast_mode={:} must feed the path for directory " ": {:}".format(fast_mode, file_path_or_dict)
+                        "fast_mode={:} must feed the path for directory "
+                        ": {:}".format(fast_mode, file_path_or_dict)
                     )
                 else:
                     self._archive_dir = file_path_or_dict
             else:
                 if nats_is_dir(file_path_or_dict):
                     raise ValueError(
-                        "fast_mode={:} must feed the path for file " ": {:}".format(fast_mode, file_path_or_dict)
+                        "fast_mode={:} must feed the path for file "
+                        ": {:}".format(fast_mode, file_path_or_dict)
                     )
                 else:
                     file_path_or_dict = pickle_load(file_path_or_dict)
@@ -144,31 +166,51 @@ class NATStopology(NASBenchMetaAPI):
                 hp2archres = collections.OrderedDict()
                 for hp_key, results in all_infos.items():
                     hp2archres[hp_key] = ArchResults.create_from_state_dict(results)
-                    self._avaliable_hps.add(hp_key)  # save the avaliable hyper-parameter
+                    self._avaliable_hps.add(
+                        hp_key
+                    )  # save the avaliable hyper-parameter
                 self.arch2infos_dict[xkey] = hp2archres
             self.evaluated_indexes = set(file_path_or_dict["evaluated_indexes"])
         elif self.archive_dir is not None:
-            benchmark_meta = pickle_load("{:}/meta.{:}".format(self.archive_dir, PICKLE_EXT))
+            benchmark_meta = pickle_load(
+                "{:}/meta.{:}".format(self.archive_dir, PICKLE_EXT)
+            )
             self.meta_archs = copy.deepcopy(benchmark_meta["meta_archs"])
             self.arch2infos_dict = collections.OrderedDict()
             self._avaliable_hps = set()
             self.evaluated_indexes = set()
         else:
             raise ValueError(
-                "file_path_or_dict [{:}] must be a dict or archive_dir " "must be set".format(type(file_path_or_dict))
+                "file_path_or_dict [{:}] must be a dict or archive_dir "
+                "must be set".format(type(file_path_or_dict))
             )
         self.archstr2index = {}
         for idx, arch in enumerate(self.meta_archs):
             if arch in self.archstr2index:
                 raise ValueError(
-                    "This [{:}]-th arch {:} already in the " "dict ({:}).".format(idx, arch, self.archstr2index[arch])
+                    "This [{:}]-th arch {:} already in the "
+                    "dict ({:}).".format(idx, arch, self.archstr2index[arch])
                 )
             self.archstr2index[arch] = idx
         if self.verbose:
             print(
                 "{:} Create NATS-Bench (topology) done with {:}/{:} architectures "
-                "avaliable.".format(time_string(), len(self.evaluated_indexes), len(self.meta_archs))
+                "avaliable.".format(
+                    time_string(), len(self.evaluated_indexes), len(self.meta_archs)
+                )
             )
+
+    @property
+    def is_size(self):
+        return False
+
+    @property
+    def is_topology(self):
+        return True
+
+    @property
+    def full_epochs_in_paper(self):
+        return 200
 
     def get_unique_str(self, arch):
         """Return a unique string for the isomorphism architectures.
@@ -179,7 +221,9 @@ class NATStopology(NASBenchMetaAPI):
         Returns:
           the unique string.
         """
-        index = self.query_index_by_arch(arch)  # To avoid the arch is a string or an instance of a arch object
+        index = self.query_index_by_arch(
+            arch
+        )  # To avoid the arch is a string or an instance of a arch object
         arch_str = self.meta_archs[index]
         structure = topology_str2structure(arch_str)
         return structure.to_unique_str(consider_zero=True)
@@ -197,17 +241,26 @@ class NATStopology(NASBenchMetaAPI):
           ArchResults instance
         """
         if self.verbose:
-            print("{:} Call query_info_str_by_arch with arch={:}" "and hp={:}".format(time_string(), arch, hp))
+            print(
+                "{:} Call query_info_str_by_arch with arch={:}"
+                "and hp={:}".format(time_string(), arch, hp)
+            )
         return self._query_info_str_by_arch(arch, hp, print_information)
 
-    def get_more_info(self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True):
+    def get_more_info(
+        self, index, dataset, iepoch=None, hp: Text = "12", is_random: bool = True
+    ):
         """Return the metric for the `index`-th architecture."""
         if self.verbose:
             print(
                 "{:} Call the get_more_info function with index={:}, dataset={:}, "
-                "iepoch={:}, hp={:}, and is_random={:}.".format(time_string(), index, dataset, iepoch, hp, is_random)
+                "iepoch={:}, hp={:}, and is_random={:}.".format(
+                    time_string(), index, dataset, iepoch, hp, is_random
+                )
             )
-        index = self.query_index_by_arch(index)  # To avoid the input is a string or an instance of a arch object
+        index = self.query_index_by_arch(
+            index
+        )  # To avoid the input is a string or an instance of a arch object
         self._prepare_info(index)
         if index not in self.arch2infos_dict:
             raise ValueError("Did not find {:} from arch2infos_dict.".format(index))
@@ -217,19 +270,27 @@ class NATStopology(NASBenchMetaAPI):
             seeds = archresult.get_dataset_seeds(dataset)
             is_random = random.choice(seeds)
         # collect the training information
-        train_info = archresult.get_metrics(dataset, "train", iepoch=iepoch, is_random=is_random)
+        train_info = archresult.get_metrics(
+            dataset, "train", iepoch=iepoch, is_random=is_random
+        )
         total = train_info["iepoch"] + 1
         xinfo = {
             "train-loss": train_info["loss"],
             "train-accuracy": train_info["accuracy"],
-            "train-per-time": train_info["all_time"] / total if train_info["all_time"] is not None else None,
+            "train-per-time": train_info["all_time"] / total
+            if train_info["all_time"] is not None
+            else None,
             "train-all-time": train_info["all_time"],
         }
         # collect the evaluation information
         if dataset == "cifar10-valid":
-            valid_info = archresult.get_metrics(dataset, "x-valid", iepoch=iepoch, is_random=is_random)
+            valid_info = archresult.get_metrics(
+                dataset, "x-valid", iepoch=iepoch, is_random=is_random
+            )
             try:
-                test_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                test_info = archresult.get_metrics(
+                    dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                )
             except Exception as unused_e:  # pylint: disable=broad-except
                 test_info = None
             valtest_info = None
@@ -247,18 +308,26 @@ class NATStopology(NASBenchMetaAPI):
                 )
             try:  # collect results on the proposed test set
                 if dataset == "cifar10":
-                    test_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                    test_info = archresult.get_metrics(
+                        dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                    )
                 else:
-                    test_info = archresult.get_metrics(dataset, "x-test", iepoch=iepoch, is_random=is_random)
+                    test_info = archresult.get_metrics(
+                        dataset, "x-test", iepoch=iepoch, is_random=is_random
+                    )
             except Exception as unused_e:  # pylint: disable=broad-except
                 test_info = None
             try:  # collect results on the proposed validation set
-                valid_info = archresult.get_metrics(dataset, "x-valid", iepoch=iepoch, is_random=is_random)
+                valid_info = archresult.get_metrics(
+                    dataset, "x-valid", iepoch=iepoch, is_random=is_random
+                )
             except Exception as unused_e:  # pylint: disable=broad-except
                 valid_info = None
             try:
                 if dataset != "cifar10":
-                    valtest_info = archresult.get_metrics(dataset, "ori-test", iepoch=iepoch, is_random=is_random)
+                    valtest_info = archresult.get_metrics(
+                        dataset, "ori-test", iepoch=iepoch, is_random=is_random
+                    )
                 else:
                     valtest_info = None
             except Exception as unused_e:  # pylint: disable=broad-except
@@ -266,18 +335,28 @@ class NATStopology(NASBenchMetaAPI):
         if valid_info is not None:
             xinfo["valid-loss"] = valid_info["loss"]
             xinfo["valid-accuracy"] = valid_info["accuracy"]
-            xinfo["valid-per-time"] = valid_info["all_time"] / total if valid_info["all_time"] is not None else None
+            xinfo["valid-per-time"] = (
+                valid_info["all_time"] / total
+                if valid_info["all_time"] is not None
+                else None
+            )
             xinfo["valid-all-time"] = valid_info["all_time"]
         if test_info is not None:
             xinfo["test-loss"] = test_info["loss"]
             xinfo["test-accuracy"] = test_info["accuracy"]
-            xinfo["test-per-time"] = test_info["all_time"] / total if test_info["all_time"] is not None else None
+            xinfo["test-per-time"] = (
+                test_info["all_time"] / total
+                if test_info["all_time"] is not None
+                else None
+            )
             xinfo["test-all-time"] = test_info["all_time"]
         if valtest_info is not None:
             xinfo["valtest-loss"] = valtest_info["loss"]
             xinfo["valtest-accuracy"] = valtest_info["accuracy"]
             xinfo["valtest-per-time"] = (
-                valtest_info["all_time"] / total if valtest_info["all_time"] is not None else None
+                valtest_info["all_time"] / total
+                if valtest_info["all_time"] is not None
+                else None
             )
             xinfo["valtest-all-time"] = valtest_info["all_time"]
         return xinfo
@@ -309,9 +388,13 @@ class NATStopology(NASBenchMetaAPI):
         node_strs = arch_str.split("+")
         genotypes = []
         for unused_i, node_str in enumerate(node_strs):
-            inputs = list(filter(lambda x: x != "", node_str.split("|")))  # pylint: disable=g-explicit-bool-comparison
+            inputs = list(
+                filter(lambda x: x != "", node_str.split("|"))
+            )  # pylint: disable=g-explicit-bool-comparison
             for xinput in inputs:
-                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(xinput)
+                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(
+                    xinput
+                )
             inputs = (xi.split("~") for xi in inputs)
             input_infos = tuple((op, int(idx)) for (op, idx) in inputs)
             genotypes.append(input_infos)
@@ -320,7 +403,13 @@ class NATStopology(NASBenchMetaAPI):
     @staticmethod
     def str2matrix(
         arch_str: Text,
-        search_space: List[Text] = ("none", "skip_connect", "nor_conv_1x1", "nor_conv_3x3", "avg_pool_3x3"),
+        search_space: List[Text] = (
+            "none",
+            "skip_connect",
+            "nor_conv_1x1",
+            "nor_conv_3x3",
+            "avg_pool_3x3",
+        ),
     ) -> np.ndarray:
         """Convert the string-based architecture encoding to the encoding strategy in NAS-Bench-101.
 
@@ -349,13 +438,19 @@ class NATStopology(NASBenchMetaAPI):
         num_nodes = len(node_strs) + 1
         matrix = np.zeros((num_nodes, num_nodes))
         for i, node_str in enumerate(node_strs):
-            inputs = list(filter(lambda x: x != "", node_str.split("|")))  # pylint: disable=g-explicit-bool-comparison
+            inputs = list(
+                filter(lambda x: x != "", node_str.split("|"))
+            )  # pylint: disable=g-explicit-bool-comparison
             for xinput in inputs:
-                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(xinput)
+                assert len(xinput.split("~")) == 2, "invalid input length : {:}".format(
+                    xinput
+                )
             for xi in inputs:
                 op, idx = xi.split("~")
                 if op not in search_space:
-                    raise ValueError("this op ({:}) is not in {:}".format(op, search_space))
+                    raise ValueError(
+                        "this op ({:}) is not in {:}".format(op, search_space)
+                    )
                 op_idx, node_idx = search_space.index(op), int(idx)
                 matrix[i + 1, node_idx] = op_idx
         return matrix
