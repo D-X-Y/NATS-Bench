@@ -26,8 +26,6 @@ from nats_bench.api_utils import time_string
 
 from nats_bench.genotype_utils import topology_str2structure
 
-import numpy as np
-
 
 ALL_BASE_NAMES = ["NATS-tss-v1_0-3ffb9"]
 
@@ -410,7 +408,7 @@ class NATStopology(NASBenchMetaAPI):
             "nor_conv_3x3",
             "avg_pool_3x3",
         ),
-    ) -> np.ndarray:
+    ):
         """Convert the string-based architecture encoding to the encoding strategy in NAS-Bench-101.
 
         Args:
@@ -434,6 +432,7 @@ class NATStopology(NASBenchMetaAPI):
         [NOTE]
           If a node has two input-edges from the same node, this function does not work. One edge will be overlapped.
         """
+        import numpy as np
         node_strs = arch_str.split("+")
         num_nodes = len(node_strs) + 1
         matrix = np.zeros((num_nodes, num_nodes))
