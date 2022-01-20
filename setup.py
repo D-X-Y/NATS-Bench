@@ -19,20 +19,15 @@
 #
 # TODO(xuanyidong): upload it to conda
 #
-# [2020.08.31] v1.0
-# [2020.12.20] v1.1
-# [2021.03.17] v1.2
-# [2021.04.08] v1.3
-# [2021.04.30] v1.4
-# [2021.12.09] v1.5
 import os
 from setuptools import setup
+from nats_bench import version
 
 NAME = "nats_bench"
 REQUIRES_PYTHON = ">=3.6"
 DESCRIPTION = "API for NATS-Bench (a dataset/benchmark for neural architecture topology and size)."
 
-VERSION = "1.5"
+VERSION = version()
 
 
 def read(fname="README.md"):

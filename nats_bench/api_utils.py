@@ -805,6 +805,18 @@ class ArchResults(object):
 
         flops = [result.flop for result in results]
         params = [result.params for result in results]
+        # NOTE(xuanyidong):
+        # Due to the legacy issue, flops and params may be incorrect.
+        # This is a quick fix for this legacy issue.
+        def fix_legacy_issue(raw_list):
+            xlist = [f"{x:.5f}" for x in raw_list]
+            if len(xlist) > 1 and len(set(xlist)) > 1:  # inconsistent
+                return [raw_list[x_seeds.index(888)]]
+            else:
+                return raw_list
+
+        flops = fix_legacy_issue(flops)
+        params = fix_legacy_issue(params)
         latencies = [result.get_latency() for result in results]
         latencies = [x for x in latencies if x > 0]
         mean_latency = np.mean(latencies) if len(latencies) else None

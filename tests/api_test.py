@@ -1,10 +1,10 @@
-##############################################################################
-# Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.08 ##########################
-##############################################################################
-# NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size #
-##############################################################################
-# pytest --capture=tee-sys                                                   #
-##############################################################################
+###############################################################################################
+# Copyright (c) Xuanyi Dong [GitHub D-X-Y], 2020.08                                           #
+###############################################################################################
+# NATS-Bench: Benchmarking NAS Algorithms for Architecture Topology and Size, IEEE TPAMI 2021 #
+###############################################################################################
+# pytest --capture=tee-sys                                                                    #
+###############################################################################################
 """This file is used to quickly test the API."""
 import os
 import pytest
@@ -29,6 +29,14 @@ def get_fake_torch_home_dir():
         )
 
 
+def close_to(a, b, eps=1e-4):
+    if b != 0 and abs(a - b) / abs(b) > eps:
+        return False
+    if a != 0 and abs(a - b) / abs(a) > eps:
+        return False
+    return True
+
+
 class TestNATSBench(object):
     """A class to test different functions of NATS-Bench API."""
 
@@ -47,11 +55,17 @@ class TestNATSBench(object):
         return _test_nats_bench(benchmark_dir, False, fake_random)
 
     def prepare_fake_tss(self):
-        print("")
         tss_benchmark_dir = os.path.join(
             get_fake_torch_home_dir(), tss_base_names[-1] + "-simple"
         )
         api = NATStopology(tss_benchmark_dir, True, False)
+        return api
+
+    def prepare_fake_sss(self):
+        sss_benchmark_dir = os.path.join(
+            get_fake_torch_home_dir(), sss_base_names[-1] + "-simple"
+        )
+        api = NATSsize(sss_benchmark_dir, True, False)
         return api
 
     def test_01_th_issue(self):
@@ -136,6 +150,29 @@ class TestNATSBench(object):
             unique_strs.append(structure.to_unique_str(consider_zero=True))
         unique_strs = set(unique_strs)
         assert len(unique_strs) == 6466, "{:} vs {:}".format(len(unique_strs), 6446)
+
+    def test_36_th_issue(self):
+        # https://github.com/D-X-Y/NATS-Bench/issues/36
+        apis = [self.prepare_fake_tss(), self.prepare_fake_sss()]
+        indexes = [0, 11, 284]
+        datasets = ("cifar10-valid", "cifar10", "cifar100", "ImageNet16-120")
+        for api in apis:
+            for index in indexes:
+                for dataset in datasets:
+                    info_12 = api.get_cost_info(index, dataset, hp="12")
+                    info_full = api.get_cost_info(
+                        index, dataset, hp=api.full_epochs_in_paper
+                    )
+                    assert close_to(info_12["flops"], info_full["flops"]), (
+                        f"The {index}-th "
+                        f"architecture has issues on {dataset} "
+                        f"-- {info_12['flops']} vs {info_full['flops']}."
+                    )  # check the FLOPs
+                    assert close_to(info_12["params"], info_full["params"]), (
+                        f"The {index}-th "
+                        f"architecture has issues on {dataset} "
+                        f"-- {info_12['params']} vs {info_full['params']}."
+                    )  # check the number of parameters
 
 
 def _test_nats_bench(benchmark_dir, is_tss, fake_random, verbose=False):
