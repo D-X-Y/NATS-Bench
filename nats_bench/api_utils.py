@@ -22,11 +22,13 @@ import time
 from typing import Any, Dict, Optional, Text, Union
 import warnings
 
-import numpy as np
-
 
 _FILE_SYSTEM = "default"
 PICKLE_EXT = "pickle.pbz2"
+
+
+def mean(xlist):
+    return sum(xlist) / len(xlist)
 
 
 def time_string():
@@ -819,7 +821,7 @@ class ArchResults(object):
         params = fix_legacy_issue(params)
         latencies = [result.get_latency() for result in results]
         latencies = [x for x in latencies if x > 0]
-        mean_latency = np.mean(latencies) if len(latencies) else None
+        mean_latency = mean(latencies) if len(latencies) else None
         time_infos = collections.defaultdict(list)
         for result in results:
             time_info = result.get_times()
@@ -827,13 +829,13 @@ class ArchResults(object):
                 time_infos[key].append(value)
 
         info = {
-            "flops": np.mean(flops),
-            "params": np.mean(params),
+            "flops": mean(flops),
+            "params": mean(params),
             "latency": mean_latency,
         }
         for key, value in time_infos.items():
             if len(value) and value[0] is not None:
-                info[key] = np.mean(value)
+                info[key] = mean(value)
             else:
                 info[key] = None
         return info
@@ -896,7 +898,7 @@ class ArchResults(object):
         elif isinstance(is_random, bool) and not is_random:  # average
             for key, value in infos.items():
                 if len(value) and value[0] is not None:
-                    return_info[key] = np.mean(value)
+                    return_info[key] = mean(value)
                 else:
                     return_info[key] = None
         elif isinstance(is_random, int):  # specify the seed
@@ -1267,8 +1269,8 @@ class ResultsCount(object):
         if self.train_times is not None and isinstance(self.train_times, dict):
             train_times = list(self.train_times.values())
             time_info = {
-                "T-train@epoch": np.mean(train_times),
-                "T-train@total": np.sum(train_times),
+                "T-train@epoch": mean(train_times),
+                "T-train@total": sum(train_times),
             }
         else:
             time_info = {"T-train@epoch": None, "T-train@total": None}
@@ -1278,8 +1280,8 @@ class ResultsCount(object):
                     self.eval_times["{:}@{:}".format(name, i)]
                     for i in range(self.epochs)
                 ]
-                time_info["T-{:}@epoch".format(name)] = np.mean(xtimes)
-                time_info["T-{:}@total".format(name)] = np.sum(xtimes)
+                time_info["T-{:}@epoch".format(name)] = mean(xtimes)
+                time_info["T-{:}@total".format(name)] = sum(xtimes)
             except Exception as unused_e:  # pylint: disable=broad-except
                 time_info["T-{:}@epoch".format(name)] = None
                 time_info["T-{:}@total".format(name)] = None
