@@ -433,6 +433,7 @@ class NATStopology(NASBenchMetaAPI):
           If a node has two input-edges from the same node, this function does not work. One edge will be overlapped.
         """
         import numpy as np
+
         node_strs = arch_str.split("+")
         num_nodes = len(node_strs) + 1
         matrix = np.zeros((num_nodes, num_nodes))
