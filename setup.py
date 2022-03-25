@@ -15,7 +15,7 @@
 # https://pypi.org/project/nats-bench
 #
 # NOTE(xuanyidong):
-# local install = `python setup.py install --force`
+# local install = `pip install . --force`
 #
 # TODO(xuanyidong): upload it to conda
 #
@@ -38,7 +38,7 @@ def read(fname="README.md"):
 
 
 # What packages are required for this module to be executed?
-REQUIRED = ["numpy>=1.16.5,<=1.19.5"]
+REQUIRED = ["numpy>=1.16.5"]
 
 setup(
     name=NAME,
