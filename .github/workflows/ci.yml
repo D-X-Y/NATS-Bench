@@ -43,7 +43,7 @@ jobs:
 
       - name: Install nats_bench from source
         run: |
-          python setup.py install
+          pip install .
 
       - name: Run tests with pytest
         run: |

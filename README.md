@@ -12,7 +12,7 @@ We also show the versatility of NATS-Bench by benchmarking 13 recent state-of-th
 This facilitates a much larger community of researchers to focus on developing better NAS algorithms in a more comparable and computationally effective environment.
 
 **You can use `pip install nats_bench` to install the library of NATS-Bench
-or install from source by `python setup.py install`.**
+or install from source by `pip install .`.**
 
 If you are seeking how to re-create NATS-Bench from scratch or reproduce benchmarked results, please see use [AutoDL-Projects](https://github.com/D-X-Y/AutoDL-Projects) and see these [instructions](https://github.com/D-X-Y/NATS-Bench#how-to-re-create-nats-bench-from-scratch).
 
