@@ -22,6 +22,7 @@ NATS_BENCH_API_VERSIONs = [
     "v1.4",  # [2021.04.30] add topology_str2structure
     "v1.5",  # [2021.12.09] make simulate_train_eval more robust
     "v1.6",  # [2022.01.19] fix the inconsistent flop/params which is caused by a legacy (weight migration) issue
+    "v1.7",  # [2022.03.25] relax enforce_all kwargs and add a test
 ]
 NATS_BENCH_SSS_NAMEs = ("sss", "size")
 NATS_BENCH_TSS_NAMEs = ("tss", "topology")

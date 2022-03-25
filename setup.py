@@ -16,6 +16,7 @@
 #
 # NOTE(xuanyidong):
 # local install = `pip install . --force`
+# local test = `pytest . -s`
 #
 # TODO(xuanyidong): upload it to conda
 #

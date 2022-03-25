@@ -139,6 +139,22 @@ class TestNATSBench(object):
             )
         )
 
+    def test_07_th_issue(self):
+        # https://github.com/D-X-Y/NATS-Bench/issues/7
+        apis = [self.prepare_fake_tss(), self.prepare_fake_sss()]
+        indexes = [0, 11, 284]
+        datasets = ("cifar10-valid", "cifar10", "cifar100", "ImageNet16-120")
+        for api in apis:
+            for index in indexes:
+                for dataset in datasets:
+                    _ = api.get_cost_info(index, dataset, hp="12")
+            best_arch_index, highest_valid_accuracy = api.find_best(
+                dataset=dataset, metric_on_set="valid", hp="12", enforce_all=False
+            )
+            print(
+                f"api={api}, best_arch_index={best_arch_index}, highest_valid_accuracy={highest_valid_accuracy}"
+            )
+
     def test_12_th_issue(self):
         # https://github.com/D-X-Y/NATS-Bench/issues/13
         api = self.prepare_fake_tss()

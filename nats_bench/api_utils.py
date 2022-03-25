@@ -555,7 +555,7 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
         flop_max=None,
         param_max=None,
         hp: Text = "12",
-        enforce_all: bool = True,
+        enforce_all: Optional[bool] = None,
     ):
         """Find the architecture with the highest accuracy based on some constraints."""
         # Please see how to set the `dataset` and `metric_on_set` (setname) at here:
@@ -571,6 +571,8 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
             dataset, metric_on_set, self.verbose
         )
         best_index, highest_accuracy = -1, None
+        if enforce_all is None:
+            enforce_all = True if self.fast_mode else False
         if enforce_all:
             # We set this arg `enforce_all` because in the fast mode, evaluated_indexes will be empty
             # `evaluated_indexes` is dynamically inserted with architectures along with the query
@@ -1290,11 +1292,11 @@ class ResultsCount(object):
     def get_eval_set(self):
         return self.eval_names
 
-    def judge_valid(self, iepoch):
+    def judge_valid(self, iepoch: Optional[int]):
         if iepoch < 0 or iepoch >= self.epochs:
             raise ValueError("invalid iepoch={:} < {:}".format(iepoch, self.epochs))
 
-    def get_train(self, iepoch=None):
+    def get_train(self, iepoch: Optional[int] = None):
         """Get the training information."""
         if iepoch is None:
             iepoch = self.epochs - 1
@@ -1312,7 +1314,7 @@ class ResultsCount(object):
             "all_time": atime,
         }
 
-    def get_eval(self, name, iepoch=None):
+    def get_eval(self, name, iepoch: Optional[int] = None):
         """Get the evaluation information ; there could be multiple evaluation sets (identified by the 'name' argument)."""
         if iepoch is None:
             iepoch = self.epochs - 1
@@ -1348,7 +1350,7 @@ class ResultsCount(object):
         else:
             return _internal_query(name)
 
-    def get_net_param(self, clone=False):
+    def get_net_param(self, clone: bool = False):
         if clone:
             return copy.deepcopy(self.net_state_dict)
         else:
