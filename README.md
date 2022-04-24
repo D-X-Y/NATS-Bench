@@ -30,7 +30,7 @@ This figure is the main difference between `NATS-Bench`, `NAS-Bench-101`, and `N
 
 In NATS-Bench, we (create and) use three image datasets -- CIFAR-10, CIFAR-100, and ImageNet16-120.
 For more details, please see Sec-3.2 in [the NATS-Bench paper](https://arxiv.org/pdf/2009.00437.pdf). To download these three datasets, please find them at [Google Drive](https://drive.google.com/drive/folders/1T3UIyZXUhMmIuJLOBMIYKAsJknAtrrO4?usp=sharing).
-To create the `ImageNet16-120` PyTorch dataset, please call [AutoDL-Projects/lib/datasets/ImageNet16](https://github.com/D-X-Y/AutoDL-Projects/blob/main/lib/datasets/get_dataset_with_transform.py#L168), by using:
+To create the `ImageNet16-120` PyTorch dataset, please call [AutoDL-Projects/lib/datasets/ImageNet16](https://github.com/D-X-Y/AutoDL-Projects/blob/main/xautodl/datasets/get_dataset_with_transform.py#L168), by using:
 ```
 train_data = ImageNet16(root, True , train_transform, 120)
 test_data  = ImageNet16(root, False, test_transform , 120)
