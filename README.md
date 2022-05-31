@@ -80,6 +80,19 @@ api = create(None, 'tss', fast_mode=True, verbose=True)
 
 #### 2, query the performance:
 ```
+# Show the architecture topology string of the 12-th architecture
+# For the topology structure, the string is interpreted as
+# arch = '|{}~0|+|{}~0|{}~1|+|{}~0|{}~1|{}~2|'.format(
+#         edge_node_0_to_node_1,
+#         edge_node_0_to_node_2,
+#         edge_node_1_to_node_2,
+#         edge_node_0_to_node_3,
+#         edge_node_1_to_node_3,
+#         edge_node_2_to_node_3,
+#         )
+architecture_str = api.arch(12)
+print(architecture_str)
+
 # Query the loss / accuracy / time for 1234-th candidate architecture on CIFAR-10
 # info is a dict, where you can easily figure out the meaning by key
 info = api.get_more_info(1234, 'cifar10')
