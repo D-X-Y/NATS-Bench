@@ -81,7 +81,7 @@ api = create(None, 'tss', fast_mode=True, verbose=True)
 #### 2, query the performance:
 ```
 # Show the architecture topology string of the 12-th architecture
-# For the topology structure, the string is interpreted as
+# For the topology search space, the string is interpreted as
 # arch = '|{}~0|+|{}~0|{}~1|+|{}~0|{}~1|{}~2|'.format(
 #         edge_node_0_to_node_1,
 #         edge_node_0_to_node_2,
@@ -90,6 +90,13 @@ api = create(None, 'tss', fast_mode=True, verbose=True)
 #         edge_node_1_to_node_3,
 #         edge_node_2_to_node_3,
 #         )
+# For the size search space, the string is interpreted as
+# arch = '{}:{}:{}:{}:{}'.format(out_channel_of_1st_conv_layer,
+#                                out_channel_of_1st_cell_stage,
+#                                out_channel_of_1st_residual_block,
+#                                out_channel_of_2nd_cell_stage,
+#                                out_channel_of_2nd_residual_block,
+#                                )
 architecture_str = api.arch(12)
 print(architecture_str)
 
