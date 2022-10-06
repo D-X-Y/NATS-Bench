@@ -270,7 +270,7 @@ class NASBenchMetaAPI(metaclass=abc.ABCMeta):
                 index, dataset, iepoch=None, hp=hp, is_random=True
             )
             time_cost = info["train-all-time"] + temp_info["valid-per-time"]
-        latency = self.get_latency(index, dataset)
+        latency = self.get_latency(index, dataset, hp=hp)
         if account_time:
             self._used_time += time_cost
         return valid_acc, latency, time_cost, self._used_time
