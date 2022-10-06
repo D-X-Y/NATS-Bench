@@ -43,14 +43,14 @@ class TestNATSBench(object):
     def test_nats_bench_tss(self, benchmark_dir=None, fake_random=True):
         if benchmark_dir is None:
             benchmark_dir = os.path.join(
-                get_fake_torch_home_dir(), sss_base_names[-1] + "-simple"
+                get_fake_torch_home_dir(), tss_base_names[-1] + "-simple"
             )
         return _test_nats_bench(benchmark_dir, True, fake_random)
 
     def test_nats_bench_sss(self, benchmark_dir=None, fake_random=True):
         if benchmark_dir is None:
             benchmark_dir = os.path.join(
-                get_fake_torch_home_dir(), tss_base_names[-1] + "-simple"
+                get_fake_torch_home_dir(), sss_base_names[-1] + "-simple"
             )
         return _test_nats_bench(benchmark_dir, False, fake_random)
 
@@ -190,8 +190,15 @@ class TestNATSBench(object):
                         f"-- {info_12['params']} vs {info_full['params']}."
                     )  # check the number of parameters
 
+    def test_44_th_issue(self):
+        # https://github.com/D-X-Y/NATS-Bench/issues/44
+        benchmark_dir = os.path.join(
+            get_fake_torch_home_dir(), tss_base_names[-1] + "-simple"
+        )
+        return _test_nats_bench(benchmark_dir, True, fake_random=True, hp="200")
 
-def _test_nats_bench(benchmark_dir, is_tss, fake_random, verbose=False):
+
+def _test_nats_bench(benchmark_dir, is_tss, fake_random, hp="12", verbose=False):
     """The main test entry for NATS-Bench."""
     if is_tss:
         api = NATStopology(benchmark_dir, True, verbose)
@@ -229,7 +236,7 @@ def _test_nats_bench(benchmark_dir, is_tss, fake_random, verbose=False):
                 latency,
                 time_cost,
                 current_total_time_cost,
-            ) = api.simulate_train_eval(index, dataset=key, hp="12")
+            ) = api.simulate_train_eval(index, dataset=key, hp=hp)
             print(
                 "  -->> The validation accuracy={:}, latency={:}, "
                 "the current time cost={:} s, accumulated time cost={:} s".format(
